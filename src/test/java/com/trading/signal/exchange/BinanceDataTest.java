@@ -19,6 +19,7 @@ import reactor.test.StepVerifier;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,6 +50,25 @@ public class BinanceDataTest {
         this.mockWebServer.shutdown();
     }
 
+    @Test
+    void shouldFetchBinanceSymbols() throws JsonProcessingException {
+        var mockResponse = new MockResponse()
+                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .setBody(mapper.writeValueAsString(List.of(
+                        Map.of(
+                                "symbol", "ZRXUSDT", "price", "0.34050000"
+                        )
+                )));
+
+        mockWebServer.enqueue(mockResponse);
+
+        Mono symbols = binanceData.fetchSymbols();
+
+        StepVerifier.create(symbols)
+                .expectNextMatches(it -> it.equals(List.of("ZRXUSDT")))
+                .verifyComplete();
+
+    }
 
     @Test
     void shouldFetchOHLCCandles() throws JsonProcessingException {
@@ -159,10 +179,31 @@ public class BinanceDataTest {
                 );
     }
 
+
+    @Test
+    void willReturnAListOfSymbols() {
+        List<Map<String, String>> l0 = List.of(
+                Map.of(
+                        "symbol", "ZRXUSDT", "price", "0.34050000"
+                )
+        );
+
+        assertThat(BinanceData.toSymbolsList(l0))
+                .isEqualTo(
+                        List.of("ZRXUSDT")
+                );
+    }
+
     @Test
     void willReturnAndArrayOfNullValues() {
         assertThat(BinanceData.toCandlesArray(null)).isEqualTo(new Candle[0]);
         assertThat(BinanceData.toCandlesArray(List.of())).isEqualTo(new Candle[0]);
+    }
+
+    @Test
+    void willReturnAnEmptyList() {
+        assertThat(BinanceData.toSymbolsList(null)).isEqualTo(List.of());
+        assertThat(BinanceData.toSymbolsList(List.of())).isEqualTo(List.of());
     }
 
 

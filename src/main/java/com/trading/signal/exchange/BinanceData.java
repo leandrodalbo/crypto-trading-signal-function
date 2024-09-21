@@ -11,13 +11,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class BinanceData {
 
     private static final String KLINES = "/api/v3/klines";
+    private static final String EXCHANGE_INFO = "api/v3/ticker/price";
     private static final int TOTAL_CANDLES = 150;
+
+    private static final String USDT = "USDT";
+    private static final String BUSD = "BUSD";
 
     protected final WebClient client;
 
@@ -50,6 +56,24 @@ public class BinanceData {
         return result;
     }
 
+    public static List<String> toSymbolsList(List values) {
+        if (values == null || values.isEmpty()) {
+            return List.of();
+        }
+
+        List symbols = new ArrayList();
+
+        for (int i = 0; i < values.size(); i++) {
+            String symbol = ((Map<String, String>) values.get(i)).get("symbol");
+
+            if (symbol.endsWith(USDT) || symbol.endsWith(BUSD))
+                symbols.add(symbol);
+
+        }
+
+        return symbols;
+    }
+
     public Mono<Candle[]> fetchOHLC(String symbol, Timeframe speed) {
         return client.get()
                 .uri(
@@ -66,6 +90,18 @@ public class BinanceData {
                         return toCandlesArray((List) it);
                     return new Candle[0];
                 })
+                .doOnError(e -> logger.error(e.getClass().getSimpleName()));
+    }
+
+    public Mono<List<String>> fetchSymbols() {
+        return client.get()
+                .uri(
+                        builder -> builder.path(EXCHANGE_INFO)
+                                .build())
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .retrieve()
+                .bodyToMono(List.class)
+                .map(BinanceData::toSymbolsList)
                 .doOnError(e -> logger.error(e.getClass().getSimpleName()));
     }
 

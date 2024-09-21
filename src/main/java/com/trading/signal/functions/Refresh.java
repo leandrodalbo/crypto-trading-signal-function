@@ -3,11 +3,9 @@ package com.trading.signal.functions;
 
 import com.trading.signal.service.RefreshService;
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 
-public class Refresh implements Function<Object, Object> {
-    public static final String REFRESH_TRIGGERED = "refresh-function-triggered";
-
+public class Refresh implements Consumer<Object> {
     private final RefreshService refreshService;
 
     public Refresh(RefreshService refreshService) {
@@ -15,8 +13,7 @@ public class Refresh implements Function<Object, Object> {
     }
 
     @Override
-    public Object apply(Object o) {
+    public void accept(Object o) {
         refreshService.refresh();
-        return REFRESH_TRIGGERED;
     }
 }

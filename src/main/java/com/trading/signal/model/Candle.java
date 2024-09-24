@@ -6,7 +6,7 @@ public record Candle(
         Float high,
         Float low,
         Float close,
-        Integer volume
+        Float volume
 
 ) {
 
@@ -14,7 +14,7 @@ public record Candle(
                             Float high,
                             Float low,
                             Float close,
-                            Integer volume) {
+                            Float volume) {
         return new Candle(open, high, low, close, volume);
 
     }

@@ -36,6 +36,10 @@ public class MACDIndicator {
         int slowPeriod = (macdSlowPeriod != 0) ? macdSlowPeriod : SLOW_PERIOD;
         int signalPeriod = (macdSignalPeriod != 0) ? macdSignalPeriod : SIGNAL_PERIOD;
 
+        if (values.length < SLOW_PERIOD + SIGNAL_PERIOD) {
+            return Map.of(MACD_KEY, new double[0], SIGNAL_KEY, new double[0]);
+        }
+
         double[] macd = new double[values.length];
         double[] signal = new double[values.length];
         double[] hist = new double[values.length];

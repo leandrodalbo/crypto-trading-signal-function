@@ -26,4 +26,17 @@ public class MACDIndicatorTest {
         assertThat(macd[signal.length - 1]).isNotEqualTo(0.0);
         assertThat(macd[signal.length - 3]).isNotEqualTo(0.0);
     }
+
+    @Test
+    void shouldReturnAMapWithEmptyArrays() {
+        float[] values = new float[]{43.4f};
+
+        Map<String, double[]> result = macdIndicator.macdAndSignal(values);
+
+        double[] macd = result.get(MACDIndicator.MACD_KEY);
+        double[] signal = result.get(MACDIndicator.SIGNAL_KEY);
+
+        assertThat(signal.length).isEqualTo(0);
+        assertThat(macd.length).isEqualTo(0);
+    }
 }

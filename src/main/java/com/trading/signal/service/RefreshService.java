@@ -15,6 +15,8 @@ import reactor.core.publisher.Flux;
 import java.time.Duration;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
+
 @Service
 public class RefreshService {
     private final Logger logger = LoggerFactory.getLogger(RefreshService.class);
@@ -49,74 +51,61 @@ public class RefreshService {
     }
 
     public void refresh() {
-        // this.binanceData.fetchSymbols()
-        Flux.just(List.of("BTCUSDT"))
-                .subscribe(symbols -> {
-                    symbols.forEach(
-                            symbol -> {
-                                publishH1Signal(symbol);
-                                publishH4Signal(symbol);
-                                publishD1Signal(symbol);
+        this.binanceData.fetchSymbols()
+                .subscribe(symbols -> symbols.forEach(
+                        symbol -> {
+                            Thread h1 = new Thread(() ->
+                                    publishSignal(symbol, Timeframe.H1));
+                            Thread h4 = new Thread(() ->
+                                    publishSignal(symbol, Timeframe.H4));
+                            Thread d1 = new Thread(() ->
+                                    publishSignal(symbol, Timeframe.D1));
+
+                            try {
+
+                                h1.start();
+                                sleep(1000);
+                                h4.start();
+                                sleep(1000);
+                                d1.start();
+                                sleep(1000);
+
+                                logger.info(String.format("Signal published for %s ", symbol));
+                            } catch (Exception e) {
+                                logger.error(String.format("Signal Failed for %s ", symbol));
+                                logger.error(e.toString());
                             }
-                    );
-                });
+                        }
+                ));
     }
 
-    private void publishH1Signal(String symbol) {
-        try {
-            publishSignal(symbol, Timeframe.H1);
-            Thread.sleep(2000);
-            logger.info(String.format("Signal published for %s on timeframe %s ", symbol, Timeframe.H1));
-        } catch (Exception e) {
-            logger.error(String.format("Signal Failed for %s on timeframe %s ", symbol, Timeframe.H1));
-            logger.error(e.toString());
-        }
-    }
-
-    private void publishH4Signal(String symbol) {
-        try {
-            publishSignal(symbol, Timeframe.H4);
-            Thread.sleep(2000);
-            logger.info(String.format("Signal published for %s on timeframe %s ", symbol, Timeframe.H4));
-        } catch (Exception e) {
-            logger.error(String.format("Signal Failed for %s on timeframe %s ", symbol, Timeframe.H4));
-            logger.error(e.toString());
-        }
-    }
-
-    private void publishD1Signal(String symbol) {
-        try {
-            publishSignal(symbol, Timeframe.D1);
-            Thread.sleep(2000);
-            logger.info(String.format("Signal published for %s on timeframe %s ", symbol, Timeframe.D1));
-        } catch (Exception e) {
-            logger.error(String.format("Signal Failed for %s on timeframe %s ", symbol, Timeframe.D1));
-            logger.error(e.toString());
-        }
-    }
 
     private void publishSignal(String symbol, Timeframe timeframe) {
-        binanceData.fetchOHLC(symbol, timeframe).delayElement(Duration.ofSeconds(1)).subscribe(candles -> {
-            float[] closingPrices = adapterService.closingPrices(candles);
-            float[] highPrices = adapterService.highPrices(candles);
-            float[] lowPrices = adapterService.lowPrices(candles);
-            float[] volumes = adapterService.volumes(candles);
+        binanceData.fetchOHLC(symbol, timeframe).subscribe(
+                candles -> {
+                    float[] closingPrices = adapterService.closingPrices(candles);
+                    float[] highPrices = adapterService.highPrices(candles);
+                    float[] lowPrices = adapterService.lowPrices(candles);
+                    float[] volumes = adapterService.volumes(candles);
 
-            Signal signal = Signal.of(
-                    symbol,
-                    timeframe,
-                    bollingBandsStrategy.bollingerBandsSignal(closingPrices, closingPrices[closingPrices.length - 1]),
-                    emaStrategy.emaSignal(closingPrices),
-                    smaStrategy.smaSignal(closingPrices),
-                    macdStrategy.macdSignal(closingPrices),
-                    onBalanceVolumeStrategy.obvSignal(closingPrices, volumes),
-                    rsiStrategy.rsiSignal(closingPrices),
-                    rsiDiveregenceStrategy.rsiDivergenceSignal(closingPrices),
-                    stochasticIndicatorStrategy.stochasticSignal(highPrices, lowPrices, closingPrices),
-                    engulfingCandleStrategy.engulfingSignal(candles != null ? candles : new Candle[0])
-            );
+                    Signal signal = Signal.of(
+                            symbol,
+                            timeframe,
+                            bollingBandsStrategy.bollingerBandsSignal(closingPrices, closingPrices[closingPrices.length - 1]),
+                            emaStrategy.emaSignal(closingPrices),
+                            smaStrategy.smaSignal(closingPrices),
+                            macdStrategy.macdSignal(closingPrices),
+                            onBalanceVolumeStrategy.obvSignal(closingPrices, volumes),
+                            rsiStrategy.rsiSignal(closingPrices),
+                            rsiDiveregenceStrategy.rsiDivergenceSignal(closingPrices),
+                            stochasticIndicatorStrategy.stochasticSignal(highPrices, lowPrices, closingPrices),
+                            engulfingCandleStrategy.engulfingSignal(candles != null ? candles : new Candle[0])
+                    );
 
-            rabbitTemplate.convertAndSend(RabbitConf.EXCHANGE_NAME, RabbitConf.ROUTING_KEY, signal);
-        });
+                    rabbitTemplate.convertAndSend(RabbitConf.EXCHANGE_NAME, RabbitConf.ROUTING_KEY, signal);
+                }
+        );
+
+
     }
 }

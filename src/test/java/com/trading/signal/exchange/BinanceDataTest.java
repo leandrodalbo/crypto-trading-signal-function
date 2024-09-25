@@ -153,7 +153,7 @@ public class BinanceDataTest {
                 "24.0",
                 "25.0",
                 "26.0",
-                "232"
+                "232.0f"
         );
 
         List<Object> c1 = List.of(
@@ -162,7 +162,7 @@ public class BinanceDataTest {
                 "28.0",
                 "29.0",
                 "30.0",
-                "232"
+                "232.0f"
         );
         assertThat(BinanceData.toCandlesArray(List.of(c0, c1)))
                 .isEqualTo(
@@ -170,11 +170,11 @@ public class BinanceDataTest {
                                 Candle.of(23.0f,
                                         24.0f,
                                         25.0f,
-                                        26.0f, 232),
+                                        26.0f, 232.0f),
                                 Candle.of(27.0f,
                                         28.0f,
                                         29.0f,
-                                        30.0f, 232)
+                                        30.0f, 232.0f)
                         }
                 );
     }

@@ -12,7 +12,25 @@ public class AdapterServiceTest {
 
     @Test
     public void willReturnAnArrayWithTheClosingPrices() {
-        assertThat(adapterService.closingPrices(Mono.just(new Candle[]{new Candle(23.3f, 23.5f, 23.1f, 23.3f, 232)})))
-                .isEqualTo(new float[]{23.3f});
+        assertThat(adapterService.closingPrices(new Candle[]{new Candle(23.3f, 23.5f, 23.1f, 23.8f, 232.0f)}))
+                .isEqualTo(new float[]{23.8f});
+    }
+
+    @Test
+    public void willReturnAnArrayWithTheHighPrices() {
+        assertThat(adapterService.highPrices(new Candle[]{new Candle(23.3f, 26.5f, 18.1f, 23.3f, 232.0f)}))
+                .isEqualTo(new float[]{26.5f});
+    }
+
+    @Test
+    public void willReturnAnArrayWithTheLowPrices() {
+        assertThat(adapterService.lowPrices(new Candle[]{new Candle(23.3f, 23.5f, 18.1f, 23.3f, 232.0f)}))
+                .isEqualTo(new float[]{18.1f});
+    }
+
+    @Test
+    public void willReturnAnArrayWithVolumes() {
+        assertThat(adapterService.volumes(new Candle[]{new Candle(23.3f, 23.5f, 23.1f, 23.3f, 232.0f)}))
+                .isEqualTo(new float[]{232.0f});
     }
 }

@@ -2,7 +2,6 @@ package com.trading.signal.service;
 
 import com.trading.signal.model.Candle;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,10 +9,26 @@ import java.util.List;
 @Service
 public class AdapterService {
 
-    public float[] closingPrices(Mono<Candle[]> candles) {
-        return toPrimitiveArray(Arrays.stream(candles.block()).map(Candle::close)
+    public float[] closingPrices(Candle[] candles) {
+        return toPrimitiveArray(Arrays.stream(candles).map(Candle::close)
                 .toList());
     }
+
+    public float[] lowPrices(Candle[] candles) {
+        return toPrimitiveArray(Arrays.stream(candles).map(Candle::low)
+                .toList());
+    }
+
+    public float[] highPrices(Candle[] candles) {
+        return toPrimitiveArray(Arrays.stream(candles).map(Candle::high)
+                .toList());
+    }
+
+    public float[] volumes(Candle[] candles) {
+        return toPrimitiveArray(Arrays.stream(candles).map(Candle::volume)
+                .toList());
+    }
+
 
     private float[] toPrimitiveArray(List<Float> items) {
         float[] result = new float[items.size()];

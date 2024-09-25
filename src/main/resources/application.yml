@@ -5,6 +5,11 @@ spring:
     function:
       scan:
         packages: com.trading.signal.functions
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: user
+    password: password
 
 sma:
   shortPeriod: 9

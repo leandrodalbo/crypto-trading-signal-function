@@ -1,6 +1,5 @@
 package com.trading.signal.strategy;
 
-import com.trading.signal.indicator.OnBalanceVolume;
 import com.trading.signal.indicator.StochasticIndicator;
 import com.trading.signal.model.TradingSignal;
 import org.junit.jupiter.api.Test;
@@ -33,7 +32,7 @@ public class StochasticIndicatorStrategyTest {
                 StochasticIndicator.STOCH_D_KEY, new double[]{
                         23, 21, 23, 25, 16
                 }));
-        assertThat(strategy.obvSignal(new float[0], new float[0], new float[0])).isEqualTo(TradingSignal.BUY);
+        assertThat(strategy.stochasticSignal(new float[0], new float[0], new float[0])).isEqualTo(TradingSignal.BUY);
     }
 
     @Test
@@ -45,7 +44,7 @@ public class StochasticIndicatorStrategyTest {
                 StochasticIndicator.STOCH_D_KEY, new double[]{
                         81, 78, 77, 79, 84
                 }));
-        assertThat(strategy.obvSignal(new float[0], new float[0], new float[0])).isEqualTo(TradingSignal.SELL);
+        assertThat(strategy.stochasticSignal(new float[0], new float[0], new float[0])).isEqualTo(TradingSignal.SELL);
 
     }
 
@@ -58,6 +57,6 @@ public class StochasticIndicatorStrategyTest {
                 StochasticIndicator.STOCH_D_KEY, new double[]{
                         81, 78, 77, 79, 80
                 }));
-        assertThat(strategy.obvSignal(new float[0], new float[0], new float[0])).isEqualTo(TradingSignal.NONE);
+        assertThat(strategy.stochasticSignal(new float[0], new float[0], new float[0])).isEqualTo(TradingSignal.NONE);
     }
 }

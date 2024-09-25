@@ -15,7 +15,7 @@ public class StochasticIndicatorStrategy {
         this.indicator = indicator;
     }
 
-    public TradingSignal obvSignal(float[] high, float[] low, float[] close) {
+    public TradingSignal stochasticSignal(float[] high, float[] low, float[] close) {
 
         Map<String, double[]> obvMap = indicator.stochasticValues(high, low, close);
         double[] kValues = obvMap.get(StochasticIndicator.STOCH_k_KEY);

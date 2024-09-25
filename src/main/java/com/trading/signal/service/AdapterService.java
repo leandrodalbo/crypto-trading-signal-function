@@ -2,7 +2,6 @@ package com.trading.signal.service;
 
 import com.trading.signal.model.Candle;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;

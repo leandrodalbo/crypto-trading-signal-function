@@ -10,10 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-
-import java.time.Duration;
-import java.util.List;
 
 import static java.lang.Thread.sleep;
 

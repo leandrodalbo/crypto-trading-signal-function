@@ -3,7 +3,7 @@
 Serverless Function
 
 - Fetching USD trading symbols from Binance
-- Fetch OHLC data from every symbols on different timeframes
+- Fetch OHLC data for every symbols on different timeframes
 - Use different trading indicators to find BUY/SELL signal
 - Every Signal is sent to rabbitmq to be processed
 

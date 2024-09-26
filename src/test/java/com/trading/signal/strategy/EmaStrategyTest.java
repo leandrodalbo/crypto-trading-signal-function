@@ -56,4 +56,12 @@ public class EmaStrategyTest {
         });
         assertThat(service.emaSignal(new float[0])).isEqualTo(TradingSignal.NONE);
     }
+
+    @Test
+    void noSignalWithoutAnyData() {
+        given(ema.shortEma(any())).willReturn(new double[0]);
+
+        given(ema.longEma(any())).willReturn(new double[0]);
+        assertThat(service.emaSignal(new float[0])).isEqualTo(TradingSignal.NONE);
+    }
 }

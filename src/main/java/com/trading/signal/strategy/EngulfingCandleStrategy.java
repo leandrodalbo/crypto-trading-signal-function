@@ -8,7 +8,11 @@ import org.springframework.stereotype.Service;
 public class EngulfingCandleStrategy {
 
     public TradingSignal engulfingSignal(Candle[] candles) {
-        if (candles.length == 0 || candles[candles.length - 1] == null || candles[candles.length - 2] == null || candles[candles.length - 3] == null)
+
+        if(candles.length < 3)
+            return TradingSignal.NONE;
+
+        if (candles[candles.length - 1] == null || candles[candles.length - 2] == null || candles[candles.length - 3] == null)
             return TradingSignal.NONE;
 
         if (isBullish(candles[candles.length - 2], candles[candles.length - 1]) || isBullish(candles[candles.length - 3], candles[candles.length - 2]))

@@ -56,4 +56,12 @@ public class SmaStrategyTest {
         });
         assertThat(service.smaSignal(new float[0])).isEqualTo(TradingSignal.NONE);
     }
+
+    @Test
+    void noSignalWithoutData() {
+        given(sma.shortSma(any())).willReturn(new double[0]);
+
+        given(sma.longSma(any())).willReturn(new double[0]);
+        assertThat(service.smaSignal(new float[0])).isEqualTo(TradingSignal.NONE);
+    }
 }

@@ -20,6 +20,9 @@ public class MACDStrategy {
         double[] macd = macdAndSignal.get(MACDIndicator.MACD_KEY);
         double[] signal = macdAndSignal.get(MACDIndicator.SIGNAL_KEY);
 
+        if (macd.length < 3 || signal.length < 3)
+            return TradingSignal.NONE;
+        
         if (macd[macd.length - 3] < signal[signal.length - 3] && macd[macd.length - 1] > signal[signal.length - 1]) {
             return TradingSignal.BUY;
         }

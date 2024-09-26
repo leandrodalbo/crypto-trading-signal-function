@@ -17,6 +17,9 @@ public class SmaStrategy {
         double[] shortMAs = sma.shortSma(values);
         double[] longMAs = sma.longSma(values);
 
+        if (shortMAs.length < 3 || longMAs.length < 3)
+            return TradingSignal.NONE;
+
         if (shortMAs[shortMAs.length - 3] < longMAs[longMAs.length - 3] &&
                 shortMAs[shortMAs.length - 1] > longMAs[longMAs.length - 1]
         ) {

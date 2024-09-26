@@ -49,4 +49,13 @@ public class MACDStrategyTest {
         ));
         assertThat(strategy.macdSignal(new float[0])).isEqualTo(TradingSignal.NONE);
     }
+
+    @Test
+    void noSignalWithoutData() {
+        given(indicator.macdAndSignal(any())).willReturn(Map.of(
+                MACDIndicator.MACD_KEY, new double[0],
+                MACDIndicator.SIGNAL_KEY, new double[0]
+        ));
+        assertThat(strategy.macdSignal(new float[0])).isEqualTo(TradingSignal.NONE);
+    }
 }

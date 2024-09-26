@@ -21,6 +21,9 @@ public class StochasticIndicatorStrategy {
         double[] kValues = obvMap.get(StochasticIndicator.STOCH_k_KEY);
         double[] dValues = obvMap.get(StochasticIndicator.STOCH_D_KEY);
 
+        if (kValues.length < 3 || dValues.length < 3)
+            return TradingSignal.NONE;
+        
         if (kValues[kValues.length - 3] <= dValues[dValues.length - 3] && kValues[kValues.length - 1] > dValues[dValues.length - 1] && kValues[kValues.length - 1] < 20) {
             return TradingSignal.BUY;
         }

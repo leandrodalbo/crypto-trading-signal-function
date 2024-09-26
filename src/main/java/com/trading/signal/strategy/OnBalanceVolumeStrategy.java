@@ -1,6 +1,5 @@
 package com.trading.signal.strategy;
 
-import com.trading.signal.indicator.BollingerBands;
 import com.trading.signal.indicator.OnBalanceVolume;
 import com.trading.signal.model.TradingSignal;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,9 @@ public class OnBalanceVolumeStrategy {
         Map<String, double[]> obvMap = indicator.obv(values, volumes);
         double[] obv = obvMap.get(OnBalanceVolume.OBV_KEY);
         double[] obvma = obvMap.get(OnBalanceVolume.OBV_MA_KEY);
+
+        if (obv.length < 5 || obvma.length < 5)
+            return TradingSignal.NONE;
 
         if (obv[obv.length - 5] <= obvma[obvma.length - 5] && obv[obv.length - 1] > obvma[obvma.length - 1]) {
             return TradingSignal.BUY;

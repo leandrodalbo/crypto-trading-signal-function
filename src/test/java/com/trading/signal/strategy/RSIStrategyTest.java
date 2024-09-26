@@ -44,4 +44,10 @@ public class RSIStrategyTest {
         });
         assertThat(service.rsiSignal(new float[0])).isEqualTo(TradingSignal.NONE);
     }
+
+    @Test
+    void noSignalWithoutData() {
+        given(rsi.rsi(any())).willReturn(new double[0]);
+        assertThat(service.rsiSignal(new float[0])).isEqualTo(TradingSignal.NONE);
+    }
 }

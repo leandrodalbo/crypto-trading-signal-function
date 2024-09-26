@@ -16,6 +16,7 @@ public class BollingerBands {
     public static final String LOWER_BAND_KEY = "LOWER";
     private static final int DEFAULT_PERIOD = 20;
     private static final double STD_DEV = 2;
+
     private final Core core;
     private final ZeroCleaner zeroCleaner;
 
@@ -29,7 +30,7 @@ public class BollingerBands {
         this.zeroCleaner = zeroCleaner;
     }
 
-    public Map<String, Double> bands(float[] values) {
+    public Map<String, double[]> bands(float[] values) {
         int period = (bandsPeriod != 0) ? bandsPeriod : DEFAULT_PERIOD;
         double upAndDown = (stdDev != 0) ? stdDev : STD_DEV;
 
@@ -43,6 +44,6 @@ public class BollingerBands {
         middleBand = zeroCleaner.cleanUp(middleBand);
         lowerBand = zeroCleaner.cleanUp(lowerBand);
 
-        return Map.of(UPPER_BAND_KEY, upperBand[upperBand.length - 1], MIDDLE_BAND_KEY, middleBand[middleBand.length - 1], LOWER_BAND_KEY, lowerBand[lowerBand.length - 1]);
+        return Map.of(UPPER_BAND_KEY, upperBand, MIDDLE_BAND_KEY, middleBand, LOWER_BAND_KEY, lowerBand);
     }
 }

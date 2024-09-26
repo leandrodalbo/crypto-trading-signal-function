@@ -45,4 +45,11 @@ public class RSIDivergenceStrategyTest {
         assertThat(strategy.rsiDivergenceSignal(new float[]{16, 18, 22, 25, 25})).isEqualTo(TradingSignal.NONE);
 
     }
+
+    @Test
+    void noSignalWithoutData() {
+        given(rsi.rsi(any())).willReturn(new double[0]);
+        assertThat(strategy.rsiDivergenceSignal(new float[]{16, 18, 22, 25, 25})).isEqualTo(TradingSignal.NONE);
+
+    }
 }

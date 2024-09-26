@@ -59,4 +59,12 @@ public class StochasticIndicatorStrategyTest {
                 }));
         assertThat(strategy.stochasticSignal(new float[0], new float[0], new float[0])).isEqualTo(TradingSignal.NONE);
     }
+
+    @Test
+    void noSignalWithoutData() {
+        given(indicator.stochasticValues(any(), any(), any())).willReturn(Map.of(
+                StochasticIndicator.STOCH_k_KEY, new double[0],
+                StochasticIndicator.STOCH_D_KEY, new double[0]));
+        assertThat(strategy.stochasticSignal(new float[0], new float[0], new float[0])).isEqualTo(TradingSignal.NONE);
+    }
 }

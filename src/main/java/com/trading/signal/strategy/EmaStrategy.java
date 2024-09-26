@@ -17,6 +17,9 @@ public class EmaStrategy {
         double[] shortMAs = ema.shortEma(values);
         double[] longMAs = ema.longEma(values);
 
+        if(shortMAs.length < 3 || longMAs.length < 3)
+            return TradingSignal.NONE;
+
         if (shortMAs[shortMAs.length - 3] < longMAs[longMAs.length - 3] &&
                 shortMAs[shortMAs.length - 1] > longMAs[longMAs.length - 1]
         ) {

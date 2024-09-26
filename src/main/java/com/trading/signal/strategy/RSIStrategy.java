@@ -20,6 +20,9 @@ public class RSIStrategy {
 
         double[] rsiValues = indicator.rsi(values);
 
+        if(rsiValues.length < 1)
+            return TradingSignal.NONE;
+
         if (rsiValues[rsiValues.length - 1] > SELL_ZONE)
             return TradingSignal.SELL;
 

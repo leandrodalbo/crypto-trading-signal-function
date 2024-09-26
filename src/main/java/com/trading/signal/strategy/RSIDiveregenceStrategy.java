@@ -16,6 +16,9 @@ public class RSIDiveregenceStrategy {
     public TradingSignal rsiDivergenceSignal(float[] values) {
         double[] rsiValues = this.indicator.rsi(values);
 
+        if (values.length < 5 || rsiValues.length < 5)
+            return TradingSignal.NONE;
+
         if (values[values.length - 5] > values[values.length - 3] && values[values.length - 3] > values[values.length - 1] && rsiValues[rsiValues.length - 5] < rsiValues[rsiValues.length - 3] && rsiValues[rsiValues.length - 3] < rsiValues[rsiValues.length - 1]) {
             return TradingSignal.BUY;
         }

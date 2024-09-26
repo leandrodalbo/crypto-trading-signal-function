@@ -60,4 +60,12 @@ public class OnBalanceVolumeStrategyTest {
         assertThat(strategy.obvSignal(new float[0], new float[0])).isEqualTo(TradingSignal.NONE);
 
     }
+
+    @Test
+    void noSignalWithoutData() {
+        given(indicator.obv(any(), any())).willReturn(Map.of(
+                OnBalanceVolume.OBV_KEY, new double[0],
+                OnBalanceVolume.OBV_MA_KEY, new double[0]));
+        assertThat(strategy.obvSignal(new float[0], new float[0])).isEqualTo(TradingSignal.NONE);
+    }
 }

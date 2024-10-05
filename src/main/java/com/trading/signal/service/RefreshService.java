@@ -2,9 +2,7 @@ package com.trading.signal.service;
 
 import com.trading.signal.conf.RabbitConf;
 import com.trading.signal.exchange.BinanceData;
-import com.trading.signal.model.Candle;
-import com.trading.signal.model.Signal;
-import com.trading.signal.model.Timeframe;
+import com.trading.signal.model.*;
 import com.trading.signal.strategy.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +13,8 @@ import static java.lang.Thread.sleep;
 
 @Service
 public class RefreshService {
+    private static final int TOTAL_STRATEGIES = 9;
+
     private final Logger logger = LoggerFactory.getLogger(RefreshService.class);
 
     private final RabbitTemplate rabbitTemplate;
@@ -84,9 +84,11 @@ public class RefreshService {
                     float[] lowPrices = adapterService.lowPrices(candles);
                     float[] volumes = adapterService.volumes(candles);
 
-                    Signal signal = Signal.of(
+                    Signal signalWithoutStrength = Signal.of(
                             symbol,
                             timeframe,
+                            null,
+                            null,
                             bollingBandsStrategy.bollingerBandsSignal(closingPrices, closingPrices[closingPrices.length - 1]),
                             emaStrategy.emaSignal(closingPrices),
                             smaStrategy.smaSignal(closingPrices),
@@ -98,10 +100,95 @@ public class RefreshService {
                             engulfingCandleStrategy.engulfingSignal(candles != null ? candles : new Candle[0])
                     );
 
-                    rabbitTemplate.convertAndSend(RabbitConf.EXCHANGE_NAME, RabbitConf.ROUTING_KEY, signal);
+                    rabbitTemplate.convertAndSend(
+                            RabbitConf.EXCHANGE_NAME,
+                            RabbitConf.ROUTING_KEY,
+                            this.signal(signalWithoutStrength));
                 }
         );
+    }
 
+    public SignalStrength buyStrength(Signal signal) {
+        int total_buy = 0;
 
+        if (TradingSignal.BUY.equals(signal.bollingerBands()))
+            total_buy++;
+
+        if (TradingSignal.BUY.equals(signal.ema()))
+            total_buy++;
+
+        if (TradingSignal.BUY.equals(signal.sma()))
+            total_buy++;
+
+        if (TradingSignal.BUY.equals(signal.macd()))
+            total_buy++;
+
+        if (TradingSignal.BUY.equals(signal.obv()))
+            total_buy++;
+
+        if (TradingSignal.BUY.equals(signal.rsi()))
+            total_buy++;
+
+        if (TradingSignal.BUY.equals(signal.rsiDivergence()))
+            total_buy++;
+
+        if (TradingSignal.BUY.equals(signal.stochastic()))
+            total_buy++;
+
+        if (TradingSignal.BUY.equals(signal.engulfingCandle()))
+            total_buy++;
+
+        return ((double) total_buy / TOTAL_STRATEGIES) >= 0.7 ? SignalStrength.STRONG : ((double) total_buy / TOTAL_STRATEGIES) >= 0.5 ? SignalStrength.MEDIUM : SignalStrength.LOW;
+    }
+
+    public SignalStrength sellStrength(Signal signal) {
+        int total_sell = 0;
+
+        if (TradingSignal.SELL.equals(signal.bollingerBands()))
+            total_sell++;
+
+        if (TradingSignal.SELL.equals(signal.ema()))
+            total_sell++;
+
+        if (TradingSignal.SELL.equals(signal.sma()))
+            total_sell++;
+
+        if (TradingSignal.SELL.equals(signal.macd()))
+            total_sell++;
+
+        if (TradingSignal.SELL.equals(signal.obv()))
+            total_sell++;
+
+        if (TradingSignal.SELL.equals(signal.rsi()))
+            total_sell++;
+
+        if (TradingSignal.SELL.equals(signal.rsiDivergence()))
+            total_sell++;
+
+        if (TradingSignal.SELL.equals(signal.stochastic()))
+            total_sell++;
+
+        if (TradingSignal.SELL.equals(signal.engulfingCandle()))
+            total_sell++;
+
+        return ((double) total_sell / TOTAL_STRATEGIES) >= 0.7 ? SignalStrength.STRONG : ((double) total_sell / TOTAL_STRATEGIES) >= 0.5 ? SignalStrength.MEDIUM : SignalStrength.LOW;
+    }
+
+    private Signal signal(Signal s) {
+        return Signal.of(
+                s.symbol(),
+                s.timeframe(),
+                buyStrength(s),
+                sellStrength(s),
+                s.bollingerBands(),
+                s.ema(),
+                s.sma(),
+                s.macd(),
+                s.obv(),
+                s.rsi(),
+                s.rsiDivergence(),
+                s.stochastic(),
+                s.engulfingCandle()
+        );
     }
 }

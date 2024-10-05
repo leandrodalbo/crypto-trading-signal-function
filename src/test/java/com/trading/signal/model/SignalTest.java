@@ -11,6 +11,8 @@ public class SignalTest {
         assertThat(Signal.of(
                 "BTCUSD",
                 Timeframe.D1,
+                SignalStrength.LOW,
+                SignalStrength.STRONG,
                 TradingSignal.BUY,
                 TradingSignal.BUY,
                 TradingSignal.BUY,

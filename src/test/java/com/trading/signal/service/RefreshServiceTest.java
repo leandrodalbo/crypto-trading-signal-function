@@ -1,9 +1,7 @@
 package com.trading.signal.service;
 
 import com.trading.signal.exchange.BinanceData;
-import com.trading.signal.model.Candle;
-import com.trading.signal.model.Signal;
-import com.trading.signal.model.TradingSignal;
+import com.trading.signal.model.*;
 import com.trading.signal.strategy.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -88,6 +87,54 @@ public class RefreshServiceTest {
         verify(binanceData, times(1)).fetchSymbols();
         verify(binanceData, times(3)).fetchOHLC(anyString(), any());
         verify(rabbitTemplate, times(3)).convertAndSend(anyString(), anyString(), any(Signal.class));
+    }
+
+    @Test
+    public void willCalculateLowBuyAndSellStrength() {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE);
+
+        SignalStrength buyStrength = service.buyStrength(signal);
+        SignalStrength sellStrength = service.sellStrength(signal);
+
+        assertThat(buyStrength).isEqualTo(SignalStrength.LOW);
+        assertThat(sellStrength).isEqualTo(SignalStrength.LOW);
+
+    }
+
+    @Test
+    public void willCalculateMediumBuyStrength() {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE);
+
+        SignalStrength buyStrength = service.buyStrength(signal);
+
+        assertThat(buyStrength).isEqualTo(SignalStrength.MEDIUM);
+    }
+
+    @Test
+    public void willCalculateStrongBuyStrength() {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.NONE);
+
+        SignalStrength buyStrength = service.buyStrength(signal);
+
+        assertThat(buyStrength).isEqualTo(SignalStrength.STRONG);
+    }
+
+    @Test
+    public void willCalculateMediumSellStrength() {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE);
+
+        SignalStrength strength = service.sellStrength(signal);
+
+        assertThat(strength).isEqualTo(SignalStrength.MEDIUM);
+    }
+
+    @Test
+    public void willCalculateStrongSellStrength() {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
+
+        SignalStrength strength = service.sellStrength(signal);
+
+        assertThat(strength).isEqualTo(SignalStrength.STRONG);
     }
 }
 

@@ -37,6 +37,6 @@ stoch:
   slowKPeriod: 3
   slowDPeriod: 3
 turtle:
-  period: 14
+  period: 20
 crypto-data:
   apiEndpoint: https://api.binance.com

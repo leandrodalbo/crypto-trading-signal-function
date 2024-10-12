@@ -26,7 +26,7 @@ public class ZeroCleaner {
     private int findIndex(int[] values) {
         int i = values.length - 1;
 
-        while (i >= 0 && values[i] == 0.0)
+        while (i >= 0 && values[i] == 0)
             i--;
         return i + 1;
     }

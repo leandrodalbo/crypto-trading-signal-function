@@ -20,10 +20,13 @@ public class TurtleIndicator {
     public Map<String, Float> turtlePrices(float[] high, float[] low) {
         int period = (turtlePeriod != 0) ? turtlePeriod : DEFAULT_PERIOD;
 
-        float highest = high[high.length - 1];
-        float lowest = low[low.length - 1];
+        if (high.length < period || low.length < period)
+            return Map.of(HIGHEST_PRICE, 0f, LOWEST_PRICE, 0f);
 
-        int index = high.length - 2;
+        float highest = high[high.length - 2];
+        float lowest = low[low.length - 2];
+
+        int index = high.length - 3;
 
         while (index > 0 && period >= 0) {
 

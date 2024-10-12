@@ -1,6 +1,5 @@
 package com.trading.signal.strategy;
 
-import com.trading.signal.indicator.StochasticIndicator;
 import com.trading.signal.indicator.TurtleIndicator;
 import com.trading.signal.model.TradingSignal;
 import org.springframework.stereotype.Service;

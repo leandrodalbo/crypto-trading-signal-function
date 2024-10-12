@@ -20,4 +20,15 @@ public class TurtleIndicatorTest {
         assertThat(result.get(TurtleIndicator.LOWEST_PRICE)).isEqualTo(1.0f);
 
     }
+
+    @Test
+    void wontDoAnythingWithoutValues() {
+        float[] values = new float[0];
+
+        Map<String, Float> result = turtleIndicator.turtlePrices(values, values);
+
+        assertThat(result.get(TurtleIndicator.HIGHEST_PRICE)).isEqualTo(0f);
+        assertThat(result.get(TurtleIndicator.LOWEST_PRICE)).isEqualTo(0f);
+
+    }
 }

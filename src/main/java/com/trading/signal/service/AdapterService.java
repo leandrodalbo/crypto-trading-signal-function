@@ -24,6 +24,11 @@ public class AdapterService {
                 .toList());
     }
 
+    public float[] openPrices(Candle[] candles) {
+        return toPrimitiveArray(Arrays.stream(candles).map(Candle::open)
+                .toList());
+    }
+
     public float[] volumes(Candle[] candles) {
         return toPrimitiveArray(Arrays.stream(candles).map(Candle::volume)
                 .toList());

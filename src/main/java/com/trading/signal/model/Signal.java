@@ -13,7 +13,9 @@ public record Signal(String symbol,
                      TradingSignal rsiDivergence,
                      TradingSignal stochastic,
                      TradingSignal engulfingCandle,
-                     TradingSignal lindaMACD
+                     TradingSignal lindaMACD,
+                     TradingSignal turtleSignal,
+                     TradingSignal hammerAndShootingStars
 ) {
 
     public static Signal of(String symbol,
@@ -29,7 +31,9 @@ public record Signal(String symbol,
                             TradingSignal rsiDivergence,
                             TradingSignal stochastic,
                             TradingSignal engulfingCandle,
-                            TradingSignal lindaMACD) {
+                            TradingSignal lindaMACD,
+                            TradingSignal turtleSignal,
+                            TradingSignal hammerAndShootingStars) {
         return new Signal(symbol,
                 timeframe,
                 buyStrength,
@@ -43,6 +47,8 @@ public record Signal(String symbol,
                 rsiDivergence,
                 stochastic,
                 engulfingCandle,
-                lindaMACD);
+                lindaMACD,
+                turtleSignal,
+                hammerAndShootingStars);
     }
 }

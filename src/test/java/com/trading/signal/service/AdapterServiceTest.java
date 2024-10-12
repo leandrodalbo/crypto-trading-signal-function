@@ -29,6 +29,12 @@ public class AdapterServiceTest {
     }
 
     @Test
+    public void willReturnAnArrayWithTheOpenPrices() {
+        assertThat(adapterService.openPrices(new Candle[]{new Candle(20.8f, 23.5f, 18.1f, 23.3f, 232.0f)}))
+                .isEqualTo(new float[]{20.8f});
+    }
+
+    @Test
     public void willReturnAnArrayWithVolumes() {
         assertThat(adapterService.volumes(new Candle[]{new Candle(23.3f, 23.5f, 23.1f, 23.3f, 232.0f)}))
                 .isEqualTo(new float[]{232.0f});

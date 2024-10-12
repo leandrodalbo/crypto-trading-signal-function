@@ -5,16 +5,19 @@ import com.trading.signal.model.Signal;
 import com.trading.signal.model.Timeframe;
 import com.trading.signal.model.Candle;
 import com.trading.signal.model.SignalStrength;
-import com.trading.signal.strategy.SmaStrategy;
-import com.trading.signal.strategy.EmaStrategy;
-import com.trading.signal.strategy.RSIStrategy;
-import com.trading.signal.strategy.MACDStrategy;
-import com.trading.signal.strategy.LindaRashkeMACDStrategy;
-import com.trading.signal.strategy.StochasticIndicatorStrategy;
-import com.trading.signal.strategy.RSIDiveregenceStrategy;
-import com.trading.signal.strategy.OnBalanceVolumeStrategy;
-import com.trading.signal.strategy.EngulfingCandleStrategy;
+import com.trading.signal.strategy.TurtleStrategy;
 import com.trading.signal.strategy.BollingBandsStrategy;
+import com.trading.signal.strategy.EmaStrategy;
+import com.trading.signal.strategy.EngulfingCandleStrategy;
+import com.trading.signal.strategy.HammerAndShootingStarStrategy;
+import com.trading.signal.strategy.LindaRashkeMACDStrategy;
+import com.trading.signal.strategy.MACDStrategy;
+import com.trading.signal.strategy.OnBalanceVolumeStrategy;
+import com.trading.signal.strategy.RSIStrategy;
+import com.trading.signal.strategy.RSIDiveregenceStrategy;
+import com.trading.signal.strategy.SmaStrategy;
+import com.trading.signal.strategy.StochasticIndicatorStrategy;
+
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,6 +58,10 @@ public class SignalServiceTest {
     private SmaStrategy smaStrategy;
     @Mock
     private StochasticIndicatorStrategy stochasticIndicatorStrategy;
+    @Mock
+    private TurtleStrategy turtleStrategy;
+    @Mock
+    private HammerAndShootingStarStrategy hammerAndShootingStarStrategy;
 
     @InjectMocks
     private SignalService service;
@@ -62,10 +69,12 @@ public class SignalServiceTest {
     @Test
     public void willGenerateASignal() {
 
+        when(adapterService.openPrices(any())).thenReturn(new float[]{54934.232f});
         when(adapterService.closingPrices(any())).thenReturn(new float[]{55100.1f});
         when(adapterService.highPrices(any())).thenReturn(new float[]{55130.0f});
         when(adapterService.lowPrices(any())).thenReturn(new float[]{49989.0f});
         when(adapterService.volumes(any())).thenReturn(new float[]{2234.232f});
+
 
         when(bollingBandsStrategy.bollingerBandsSignal(any(), anyFloat())).thenReturn(TradingSignal.BUY);
         when(emaStrategy.emaSignal(any())).thenReturn(TradingSignal.BUY);
@@ -77,6 +86,8 @@ public class SignalServiceTest {
         when(rsiStrategy.rsiSignal(any())).thenReturn(TradingSignal.NONE);
         when(smaStrategy.smaSignal(any())).thenReturn(TradingSignal.BUY);
         when(stochasticIndicatorStrategy.stochasticSignal(any(), any(), any())).thenReturn(TradingSignal.NONE);
+        when(turtleStrategy.turtleSignal(any(), any(), any())).thenReturn(TradingSignal.BUY);
+        when(hammerAndShootingStarStrategy.hammerAndShootingSignal(any(), any(), any(), any())).thenReturn(TradingSignal.BUY);
 
         Signal signal = service.generate("BTCUSDT", Timeframe.D1, new Candle[]{});
 
@@ -92,12 +103,14 @@ public class SignalServiceTest {
         verify(rsiStrategy, times(1)).rsiSignal(any());
         verify(smaStrategy, times(1)).smaSignal(any());
         verify(stochasticIndicatorStrategy, times(1)).stochasticSignal(any(), any(), any());
+        verify(hammerAndShootingStarStrategy, times(1)).hammerAndShootingSignal(any(), any(), any(), any());
+        verify(turtleStrategy, times(1)).turtleSignal(any(), any(), any());
 
     }
 
     @Test
     public void willCalculateLowBuyAndSellStrength() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE);
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL);
 
         SignalStrength buyStrength = service.buyStrength(signal);
         SignalStrength sellStrength = service.sellStrength(signal);
@@ -109,7 +122,7 @@ public class SignalServiceTest {
 
     @Test
     public void willCalculateMediumBuyStrength() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
 
         SignalStrength buyStrength = service.buyStrength(signal);
 
@@ -118,7 +131,7 @@ public class SignalServiceTest {
 
     @Test
     public void willCalculateStrongBuyStrength() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.NONE);
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.NONE);
 
         SignalStrength buyStrength = service.buyStrength(signal);
 
@@ -127,7 +140,7 @@ public class SignalServiceTest {
 
     @Test
     public void willCalculateMediumSellStrength() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
 
         SignalStrength strength = service.sellStrength(signal);
 
@@ -136,7 +149,7 @@ public class SignalServiceTest {
 
     @Test
     public void willCalculateStrongSellStrength() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
 
         SignalStrength strength = service.sellStrength(signal);
 

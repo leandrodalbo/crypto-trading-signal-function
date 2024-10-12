@@ -5,22 +5,24 @@ import com.trading.signal.model.Signal;
 import com.trading.signal.model.Timeframe;
 import com.trading.signal.model.Candle;
 import com.trading.signal.model.SignalStrength;
-import com.trading.signal.strategy.SmaStrategy;
-import com.trading.signal.strategy.EmaStrategy;
-import com.trading.signal.strategy.RSIStrategy;
-import com.trading.signal.strategy.MACDStrategy;
-import com.trading.signal.strategy.LindaRashkeMACDStrategy;
-import com.trading.signal.strategy.StochasticIndicatorStrategy;
-import com.trading.signal.strategy.RSIDiveregenceStrategy;
-import com.trading.signal.strategy.OnBalanceVolumeStrategy;
-import com.trading.signal.strategy.EngulfingCandleStrategy;
+import com.trading.signal.strategy.TurtleStrategy;
 import com.trading.signal.strategy.BollingBandsStrategy;
+import com.trading.signal.strategy.EmaStrategy;
+import com.trading.signal.strategy.EngulfingCandleStrategy;
+import com.trading.signal.strategy.HammerAndShootingStarStrategy;
+import com.trading.signal.strategy.LindaRashkeMACDStrategy;
+import com.trading.signal.strategy.MACDStrategy;
+import com.trading.signal.strategy.OnBalanceVolumeStrategy;
+import com.trading.signal.strategy.RSIStrategy;
+import com.trading.signal.strategy.RSIDiveregenceStrategy;
+import com.trading.signal.strategy.SmaStrategy;
+import com.trading.signal.strategy.StochasticIndicatorStrategy;
 
 import org.springframework.stereotype.Service;
 
 @Service
 public class SignalService {
-    private static final int TOTAL_STRATEGIES = 10;
+    private static final int TOTAL_STRATEGIES = 12;
 
     private final AdapterService adapterService;
 
@@ -34,8 +36,10 @@ public class SignalService {
     private final RSIStrategy rsiStrategy;
     private final SmaStrategy smaStrategy;
     private final StochasticIndicatorStrategy stochasticIndicatorStrategy;
+    private final HammerAndShootingStarStrategy hammerAndShootingStarStrategy;
+    private final TurtleStrategy turtleStrategy;
 
-    public SignalService(AdapterService adapterService, BollingBandsStrategy bollingBandsStrategy, EmaStrategy emaStrategy, EngulfingCandleStrategy engulfingCandleStrategy, MACDStrategy macdStrategy, LindaRashkeMACDStrategy lindaMacdStrategy, OnBalanceVolumeStrategy onBalanceVolumeStrategy, RSIDiveregenceStrategy rsiDiveregenceStrategy, RSIStrategy rsiStrategy, SmaStrategy smaStrategy, StochasticIndicatorStrategy stochasticIndicatorStrategy) {
+    public SignalService(AdapterService adapterService, BollingBandsStrategy bollingBandsStrategy, EmaStrategy emaStrategy, EngulfingCandleStrategy engulfingCandleStrategy, MACDStrategy macdStrategy, LindaRashkeMACDStrategy lindaMacdStrategy, OnBalanceVolumeStrategy onBalanceVolumeStrategy, RSIDiveregenceStrategy rsiDiveregenceStrategy, RSIStrategy rsiStrategy, SmaStrategy smaStrategy, StochasticIndicatorStrategy stochasticIndicatorStrategy, HammerAndShootingStarStrategy hammerAndShootingStarStrategy, TurtleStrategy turtleStrategy) {
         this.adapterService = adapterService;
         this.bollingBandsStrategy = bollingBandsStrategy;
         this.emaStrategy = emaStrategy;
@@ -47,12 +51,16 @@ public class SignalService {
         this.rsiStrategy = rsiStrategy;
         this.smaStrategy = smaStrategy;
         this.stochasticIndicatorStrategy = stochasticIndicatorStrategy;
+        this.hammerAndShootingStarStrategy = hammerAndShootingStarStrategy;
+        this.turtleStrategy = turtleStrategy;
     }
+
 
     public Signal generate(String symbol, Timeframe timeframe, Candle[] candles) {
         float[] closingPrices = adapterService.closingPrices(candles);
         float[] highPrices = adapterService.highPrices(candles);
         float[] lowPrices = adapterService.lowPrices(candles);
+        float[] openPrices = adapterService.openPrices(candles);
         float[] volumes = adapterService.volumes(candles);
 
         Signal signalWithoutStrength = Signal.of(
@@ -69,7 +77,9 @@ public class SignalService {
                 rsiDiveregenceStrategy.rsiDivergenceSignal(closingPrices),
                 stochasticIndicatorStrategy.stochasticSignal(highPrices, lowPrices, closingPrices),
                 engulfingCandleStrategy.engulfingSignal(candles != null ? candles : new Candle[0]),
-                lindaMacdStrategy.lindaMacdSignal(closingPrices)
+                lindaMacdStrategy.lindaMacdSignal(closingPrices),
+                turtleStrategy.turtleSignal(highPrices, lowPrices, closingPrices),
+                hammerAndShootingStarStrategy.hammerAndShootingSignal(openPrices, highPrices, lowPrices, closingPrices)
         );
         return this.signal(signalWithoutStrength);
     }
@@ -105,6 +115,12 @@ public class SignalService {
             total_buy++;
 
         if (TradingSignal.BUY.equals(signal.lindaMACD()))
+            total_buy++;
+
+        if (TradingSignal.BUY.equals(signal.turtleSignal()))
+            total_buy++;
+
+        if (TradingSignal.BUY.equals(signal.hammerAndShootingStars()))
             total_buy++;
 
         return ((double) total_buy / TOTAL_STRATEGIES) >= 0.7 ? SignalStrength.STRONG : ((double) total_buy / TOTAL_STRATEGIES) >= 0.5 ? SignalStrength.MEDIUM : SignalStrength.LOW;
@@ -143,6 +159,12 @@ public class SignalService {
         if (TradingSignal.SELL.equals(signal.lindaMACD()))
             total_sell++;
 
+        if (TradingSignal.SELL.equals(signal.turtleSignal()))
+            total_sell++;
+
+        if (TradingSignal.SELL.equals(signal.hammerAndShootingStars()))
+            total_sell++;
+
         return ((double) total_sell / TOTAL_STRATEGIES) >= 0.7 ? SignalStrength.STRONG : ((double) total_sell / TOTAL_STRATEGIES) >= 0.5 ? SignalStrength.MEDIUM : SignalStrength.LOW;
     }
 
@@ -161,7 +183,9 @@ public class SignalService {
                 s.rsiDivergence(),
                 s.stochastic(),
                 s.engulfingCandle(),
-                s.lindaMACD()
+                s.lindaMACD(),
+                s.turtleSignal(),
+                s.hammerAndShootingStars()
         );
     }
 }

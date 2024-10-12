@@ -18,6 +18,8 @@ public class SignalTest {
                 TradingSignal.BUY,
                 TradingSignal.SELL,
                 TradingSignal.BUY,
+                TradingSignal.SELL,
+                TradingSignal.NONE,
                 TradingSignal.BUY,
                 TradingSignal.NONE,
                 TradingSignal.BUY,

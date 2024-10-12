@@ -21,7 +21,8 @@ public class SignalTest {
                 TradingSignal.BUY,
                 TradingSignal.NONE,
                 TradingSignal.BUY,
-                TradingSignal.SELL
+                TradingSignal.SELL,
+                TradingSignal.NONE
         )).isExactlyInstanceOf(Signal.class);
     }
 }

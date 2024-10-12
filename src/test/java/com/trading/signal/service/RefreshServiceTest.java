@@ -36,6 +36,8 @@ public class RefreshServiceTest {
     @Mock
     private MACDStrategy macdStrategy;
     @Mock
+    private LindaRashkeMACDStrategy lindaRashkeMACDStrategy;
+    @Mock
     private OnBalanceVolumeStrategy onBalanceVolumeStrategy;
     @Mock
     private RSIDiveregenceStrategy rsiDiveregenceStrategy;
@@ -65,6 +67,7 @@ public class RefreshServiceTest {
         when(emaStrategy.emaSignal(any())).thenReturn(TradingSignal.BUY);
         when(engulfingCandleStrategy.engulfingSignal(any())).thenReturn(TradingSignal.BUY);
         when(macdStrategy.macdSignal(any())).thenReturn(TradingSignal.SELL);
+        when(lindaRashkeMACDStrategy.lindaMacdSignal(any())).thenReturn(TradingSignal.NONE);
         when(onBalanceVolumeStrategy.obvSignal(any(), any())).thenReturn(TradingSignal.SELL);
         when(rsiDiveregenceStrategy.rsiDivergenceSignal(any())).thenReturn(TradingSignal.BUY);
         when(rsiStrategy.rsiSignal(any())).thenReturn(TradingSignal.NONE);
@@ -78,6 +81,7 @@ public class RefreshServiceTest {
         verify(emaStrategy, times(3)).emaSignal(any());
         verify(engulfingCandleStrategy, times(3)).engulfingSignal(any());
         verify(macdStrategy, times(3)).macdSignal(any());
+        verify(lindaRashkeMACDStrategy, times(3)).lindaMacdSignal(any());
         verify(onBalanceVolumeStrategy, times(3)).obvSignal(any(), any());
         verify(rsiDiveregenceStrategy, times(3)).rsiDivergenceSignal(any());
         verify(rsiStrategy, times(3)).rsiSignal(any());
@@ -91,7 +95,7 @@ public class RefreshServiceTest {
 
     @Test
     public void willCalculateLowBuyAndSellStrength() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE);
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE);
 
         SignalStrength buyStrength = service.buyStrength(signal);
         SignalStrength sellStrength = service.sellStrength(signal);
@@ -103,7 +107,7 @@ public class RefreshServiceTest {
 
     @Test
     public void willCalculateMediumBuyStrength() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE);
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
 
         SignalStrength buyStrength = service.buyStrength(signal);
 
@@ -112,7 +116,7 @@ public class RefreshServiceTest {
 
     @Test
     public void willCalculateStrongBuyStrength() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.NONE);
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.NONE);
 
         SignalStrength buyStrength = service.buyStrength(signal);
 
@@ -121,7 +125,7 @@ public class RefreshServiceTest {
 
     @Test
     public void willCalculateMediumSellStrength() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE);
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
 
         SignalStrength strength = service.sellStrength(signal);
 
@@ -130,7 +134,7 @@ public class RefreshServiceTest {
 
     @Test
     public void willCalculateStrongSellStrength() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
 
         SignalStrength strength = service.sellStrength(signal);
 

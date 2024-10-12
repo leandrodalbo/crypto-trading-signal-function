@@ -13,7 +13,7 @@ import static java.lang.Thread.sleep;
 
 @Service
 public class RefreshService {
-    private static final int TOTAL_STRATEGIES = 9;
+    private static final int TOTAL_STRATEGIES = 10;
 
     private final Logger logger = LoggerFactory.getLogger(RefreshService.class);
 
@@ -25,13 +25,14 @@ public class RefreshService {
     private final EmaStrategy emaStrategy;
     private final EngulfingCandleStrategy engulfingCandleStrategy;
     private final MACDStrategy macdStrategy;
+    private final LindaRashkeMACDStrategy lindaMacdStrategy;
     private final OnBalanceVolumeStrategy onBalanceVolumeStrategy;
     private final RSIDiveregenceStrategy rsiDiveregenceStrategy;
     private final RSIStrategy rsiStrategy;
     private final SmaStrategy smaStrategy;
     private final StochasticIndicatorStrategy stochasticIndicatorStrategy;
 
-    public RefreshService(RabbitTemplate rabbitTemplate, BinanceData binanceData, AdapterService adapterService, BollingBandsStrategy bollingBandsStrategy, EmaStrategy emaStrategy, EngulfingCandleStrategy engulfingCandleStrategy, MACDStrategy macdStrategy, OnBalanceVolumeStrategy onBalanceVolumeStrategy, RSIDiveregenceStrategy rsiDiveregenceStrategy, RSIStrategy rsiStrategy, SmaStrategy smaStrategy, StochasticIndicatorStrategy stochasticIndicatorStrategy) {
+    public RefreshService(RabbitTemplate rabbitTemplate, BinanceData binanceData, AdapterService adapterService, BollingBandsStrategy bollingBandsStrategy, EmaStrategy emaStrategy, EngulfingCandleStrategy engulfingCandleStrategy, MACDStrategy macdStrategy, LindaRashkeMACDStrategy lindaMacdStrategy, OnBalanceVolumeStrategy onBalanceVolumeStrategy, RSIDiveregenceStrategy rsiDiveregenceStrategy, RSIStrategy rsiStrategy, SmaStrategy smaStrategy, StochasticIndicatorStrategy stochasticIndicatorStrategy) {
         this.rabbitTemplate = rabbitTemplate;
         this.binanceData = binanceData;
         this.adapterService = adapterService;
@@ -44,6 +45,7 @@ public class RefreshService {
         this.rsiStrategy = rsiStrategy;
         this.smaStrategy = smaStrategy;
         this.stochasticIndicatorStrategy = stochasticIndicatorStrategy;
+        this.lindaMacdStrategy = lindaMacdStrategy;
     }
 
     public void refresh() {
@@ -97,7 +99,8 @@ public class RefreshService {
                             rsiStrategy.rsiSignal(closingPrices),
                             rsiDiveregenceStrategy.rsiDivergenceSignal(closingPrices),
                             stochasticIndicatorStrategy.stochasticSignal(highPrices, lowPrices, closingPrices),
-                            engulfingCandleStrategy.engulfingSignal(candles != null ? candles : new Candle[0])
+                            engulfingCandleStrategy.engulfingSignal(candles != null ? candles : new Candle[0]),
+                            lindaMacdStrategy.lindaMacdSignal(closingPrices)
                     );
 
                     rabbitTemplate.convertAndSend(
@@ -138,6 +141,9 @@ public class RefreshService {
         if (TradingSignal.BUY.equals(signal.engulfingCandle()))
             total_buy++;
 
+        if (TradingSignal.BUY.equals(signal.lindaMACD()))
+            total_buy++;
+
         return ((double) total_buy / TOTAL_STRATEGIES) >= 0.7 ? SignalStrength.STRONG : ((double) total_buy / TOTAL_STRATEGIES) >= 0.5 ? SignalStrength.MEDIUM : SignalStrength.LOW;
     }
 
@@ -171,6 +177,9 @@ public class RefreshService {
         if (TradingSignal.SELL.equals(signal.engulfingCandle()))
             total_sell++;
 
+        if (TradingSignal.SELL.equals(signal.lindaMACD()))
+            total_sell++;
+
         return ((double) total_sell / TOTAL_STRATEGIES) >= 0.7 ? SignalStrength.STRONG : ((double) total_sell / TOTAL_STRATEGIES) >= 0.5 ? SignalStrength.MEDIUM : SignalStrength.LOW;
     }
 
@@ -188,7 +197,8 @@ public class RefreshService {
                 s.rsi(),
                 s.rsiDivergence(),
                 s.stochastic(),
-                s.engulfingCandle()
+                s.engulfingCandle(),
+                s.lindaMACD()
         );
     }
 }

@@ -26,6 +26,10 @@ macd:
   fastPeriod: 12
   slowPeriod: 26
   signalPeriod: 9
+lindamacd:
+  fastPeriod: 3
+  slowPeriod: 10
+  signalPeriod: 16
 obv:
   maperiod: 14
 stoch:

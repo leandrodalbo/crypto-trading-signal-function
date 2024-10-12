@@ -21,13 +21,13 @@ public class StochasticIndicator {
     private final Core core;
     private final ZeroCleaner zeroCleaner;
 
-    @Value("${stoch.fastKPerdiod}")
+    @Value("${stoch.fastKPeriod}")
     private int fastKPeriod;
 
-    @Value("${stoch.slowKPerdiod}")
+    @Value("${stoch.slowKPeriod}")
     private int slowKPeriod;
 
-    @Value("${stoch.slowDPerdiod}")
+    @Value("${stoch.slowDPeriod}")
     private int slowDPeriod;
 
     public StochasticIndicator(Core core, ZeroCleaner zeroCleaner) {

@@ -33,9 +33,10 @@ lindamacd:
 obv:
   maperiod: 14
 stoch:
-  fastKPerdiod: 14
-  slowKPerdiod: 3
-  slowDPerdiod: 3
-
+  fastKPeriod: 14
+  slowKPeriod: 3
+  slowDPeriod: 3
+turtle:
+  period: 14
 crypto-data:
   apiEndpoint: https://api.binance.com

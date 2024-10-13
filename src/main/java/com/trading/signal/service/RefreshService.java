@@ -44,11 +44,11 @@ public class RefreshService {
                             try {
 
                                 h1.start();
-                                sleep(1000);
+                                sleep(2000);
                                 h4.start();
-                                sleep(1000);
+                                sleep(2000);
                                 d1.start();
-                                sleep(1000);
+                                sleep(2000);
 
                             } catch (Exception e) {
                                 logger.error(String.format("Signal Failed for %s ", symbol));
@@ -74,6 +74,9 @@ public class RefreshService {
                                 RabbitConf.ROUTING_KEY,
                                 signal
                         );
+                        logger.info(String.format("Published %s, Timeframe: %s, BUY=%s SELL=%s ", symbol, timeframe, signal.buyStrength(), signal.sellStrength()));
+                    } else {
+                        logger.info(String.format("Not Published %s, Timeframe: %s, BUY=%s SELL=%s ", symbol, timeframe, signal.buyStrength(), signal.sellStrength()));
                     }
                 }
         );

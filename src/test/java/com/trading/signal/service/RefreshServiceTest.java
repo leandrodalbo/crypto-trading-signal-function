@@ -1,10 +1,11 @@
 package com.trading.signal.service;
 
 import com.trading.signal.exchange.BinanceData;
-import com.trading.signal.model.TradingSignal;
 import com.trading.signal.model.Signal;
-import com.trading.signal.model.Timeframe;
+import com.trading.signal.model.SignalStrength;
+import com.trading.signal.model.TradingSignal;
 import com.trading.signal.model.Candle;
+import com.trading.signal.model.Timeframe;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,8 +38,8 @@ public class RefreshServiceTest {
     private RefreshService service;
 
     @Test
-    public void willPublishTheSymbolSignal() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
+    public void willPublishStrongBuy() {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, SignalStrength.STRONG, null, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
 
         when(binanceData.fetchSymbols()).thenReturn(Mono.just(List.of("BTCUSDT")));
         when(binanceData.fetchOHLC(anyString(), any())).thenReturn(Mono.just(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)}));
@@ -51,6 +52,92 @@ public class RefreshServiceTest {
         verify(binanceData, times(1)).fetchSymbols();
         verify(binanceData, times(3)).fetchOHLC(anyString(), any());
         verify(rabbitTemplate, times(3)).convertAndSend(anyString(), anyString(), any(Signal.class));
+        verify(signalService, times(3)).generate(anyString(), any(), any());
+    }
+
+    @Test
+    public void willPublishStrongSell() {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, SignalStrength.LOW, SignalStrength.STRONG, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
+
+        when(binanceData.fetchSymbols()).thenReturn(Mono.just(List.of("BTCUSDT")));
+        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(Mono.just(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)}));
+        when(signalService.generate(anyString(), any(), any())).thenReturn(signal);
+
+        doNothing().when(rabbitTemplate).convertAndSend(anyString(), anyString(), any(Signal.class));
+
+        service.refresh();
+
+        verify(binanceData, times(1)).fetchSymbols();
+        verify(binanceData, times(3)).fetchOHLC(anyString(), any());
+        verify(rabbitTemplate, times(3)).convertAndSend(anyString(), anyString(), any(Signal.class));
+        verify(signalService, times(3)).generate(anyString(), any(), any());
+    }
+
+    @Test
+    public void willPublishMediumBuy() {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, SignalStrength.MEDIUM, null, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
+
+        when(binanceData.fetchSymbols()).thenReturn(Mono.just(List.of("BTCUSDT")));
+        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(Mono.just(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)}));
+        when(signalService.generate(anyString(), any(), any())).thenReturn(signal);
+
+        doNothing().when(rabbitTemplate).convertAndSend(anyString(), anyString(), any(Signal.class));
+
+        service.refresh();
+
+        verify(binanceData, times(1)).fetchSymbols();
+        verify(binanceData, times(3)).fetchOHLC(anyString(), any());
+        verify(rabbitTemplate, times(3)).convertAndSend(anyString(), anyString(), any(Signal.class));
+        verify(signalService, times(3)).generate(anyString(), any(), any());
+    }
+
+    @Test
+    public void willPublishMediumSell() {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, SignalStrength.LOW, SignalStrength.MEDIUM, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
+
+        when(binanceData.fetchSymbols()).thenReturn(Mono.just(List.of("BTCUSDT")));
+        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(Mono.just(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)}));
+        when(signalService.generate(anyString(), any(), any())).thenReturn(signal);
+
+        doNothing().when(rabbitTemplate).convertAndSend(anyString(), anyString(), any(Signal.class));
+
+        service.refresh();
+
+        verify(binanceData, times(1)).fetchSymbols();
+        verify(binanceData, times(3)).fetchOHLC(anyString(), any());
+        verify(rabbitTemplate, times(3)).convertAndSend(anyString(), anyString(), any(Signal.class));
+        verify(signalService, times(3)).generate(anyString(), any(), any());
+    }
+
+    @Test
+    public void wontPublishWithNull() {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, SignalStrength.LOW, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
+
+        when(binanceData.fetchSymbols()).thenReturn(Mono.just(List.of("BTCUSDT")));
+        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(Mono.just(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)}));
+        when(signalService.generate(anyString(), any(), any())).thenReturn(signal);
+
+        service.refresh();
+
+        verify(binanceData, times(1)).fetchSymbols();
+        verify(binanceData, times(3)).fetchOHLC(anyString(), any());
+        verify(rabbitTemplate, times(0)).convertAndSend(anyString(), anyString(), any(Signal.class));
+        verify(signalService, times(3)).generate(anyString(), any(), any());
+    }
+
+    @Test
+    public void wontPublishLowSignals() {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, SignalStrength.LOW, null, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
+
+        when(binanceData.fetchSymbols()).thenReturn(Mono.just(List.of("BTCUSDT")));
+        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(Mono.just(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)}));
+        when(signalService.generate(anyString(), any(), any())).thenReturn(signal);
+
+        service.refresh();
+
+        verify(binanceData, times(1)).fetchSymbols();
+        verify(binanceData, times(3)).fetchOHLC(anyString(), any());
+        verify(rabbitTemplate, times(0)).convertAndSend(anyString(), anyString(), any(Signal.class));
         verify(signalService, times(3)).generate(anyString(), any(), any());
     }
 }

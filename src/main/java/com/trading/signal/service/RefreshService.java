@@ -2,6 +2,8 @@ package com.trading.signal.service;
 
 import com.trading.signal.conf.RabbitConf;
 import com.trading.signal.exchange.BinanceData;
+import com.trading.signal.model.Signal;
+import com.trading.signal.model.SignalStrength;
 import com.trading.signal.model.Timeframe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +50,6 @@ public class RefreshService {
                                 d1.start();
                                 sleep(1000);
 
-                                logger.info(String.format("Signal published for %s ", symbol));
                             } catch (Exception e) {
                                 logger.error(String.format("Signal Failed for %s ", symbol));
                                 logger.error(e.toString());
@@ -60,10 +61,20 @@ public class RefreshService {
     private void publishSignal(String symbol, Timeframe timeframe) {
         binanceData.fetchOHLC(symbol, timeframe).subscribe(
                 candles -> {
-                    rabbitTemplate.convertAndSend(
-                            RabbitConf.EXCHANGE_NAME,
-                            RabbitConf.ROUTING_KEY,
-                            signalService.generate(symbol, timeframe, candles));
+                    logger.info(String.format("Analysing %s, Timeframe: %s ", symbol, timeframe));
+
+                    Signal signal = signalService.generate(symbol, timeframe, candles);
+
+                    if (SignalStrength.MEDIUM.equals(signal.buyStrength()) || SignalStrength.STRONG.equals(signal.buyStrength()) ||
+                            SignalStrength.MEDIUM.equals(signal.sellStrength()) ||
+                            SignalStrength.STRONG.equals(signal.sellStrength())) {
+
+                        rabbitTemplate.convertAndSend(
+                                RabbitConf.EXCHANGE_NAME,
+                                RabbitConf.ROUTING_KEY,
+                                signal
+                        );
+                    }
                 }
         );
     }

@@ -122,7 +122,7 @@ public class SignalServiceTest {
 
     @Test
     public void willCalculateMediumBuyStrength() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
 
         SignalStrength buyStrength = service.buyStrength(signal);
 
@@ -140,7 +140,7 @@ public class SignalServiceTest {
 
     @Test
     public void willCalculateMediumSellStrength() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.BUY, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
+        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, null, null, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.NONE);
 
         SignalStrength strength = service.sellStrength(signal);
 

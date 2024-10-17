@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class SignalService {
     private static final int TOTAL_STRATEGIES = 12;
+    private static final double STRONG_STRENGTH = 0.5;
+    private static final double MEDIUM_STRENGTH = 0.3;
 
     private final AdapterService adapterService;
 
@@ -123,7 +125,7 @@ public class SignalService {
         if (TradingSignal.BUY.equals(signal.hammerAndShootingStars()))
             total_buy++;
 
-        return ((double) total_buy / TOTAL_STRATEGIES) >= 0.7 ? SignalStrength.STRONG : ((double) total_buy / TOTAL_STRATEGIES) >= 0.5 ? SignalStrength.MEDIUM : SignalStrength.LOW;
+        return ((double) total_buy / TOTAL_STRATEGIES) >= STRONG_STRENGTH ? SignalStrength.STRONG : ((double) total_buy / TOTAL_STRATEGIES) >= MEDIUM_STRENGTH ? SignalStrength.MEDIUM : SignalStrength.LOW;
     }
 
     public SignalStrength sellStrength(Signal signal) {
@@ -165,7 +167,7 @@ public class SignalService {
         if (TradingSignal.SELL.equals(signal.hammerAndShootingStars()))
             total_sell++;
 
-        return ((double) total_sell / TOTAL_STRATEGIES) >= 0.7 ? SignalStrength.STRONG : ((double) total_sell / TOTAL_STRATEGIES) >= 0.5 ? SignalStrength.MEDIUM : SignalStrength.LOW;
+        return ((double) total_sell / TOTAL_STRATEGIES) >= STRONG_STRENGTH ? SignalStrength.STRONG : ((double) total_sell / TOTAL_STRATEGIES) >= MEDIUM_STRENGTH ? SignalStrength.MEDIUM : SignalStrength.LOW;
     }
 
     private Signal signal(Signal s) {

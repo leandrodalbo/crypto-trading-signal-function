@@ -56,6 +56,7 @@ public class RefreshService {
                             }
                         }
                 ));
+        logger.info("Scan completed!!!!");
     }
 
     private void publishSignal(String symbol, Timeframe timeframe) {
@@ -74,9 +75,9 @@ public class RefreshService {
                                 RabbitConf.ROUTING_KEY,
                                 signal
                         );
-                        logger.info(String.format("Published %s, Timeframe: %s, BUY=%s SELL=%s ", symbol, timeframe, signal.buyStrength(), signal.sellStrength()));
+                        logger.info(String.format("Published %s, Timeframe: %s, LONG STRENGTH=%s, SHORT STRENGTH=%s ", symbol, timeframe, signal.buyStrength(), signal.sellStrength()));
                     } else {
-                        logger.info(String.format("Not Published %s, Timeframe: %s, BUY=%s SELL=%s ", symbol, timeframe, signal.buyStrength(), signal.sellStrength()));
+                        logger.info(String.format("Not Published %s, Timeframe: %s, LONG STRENGTH=%s, SHORT STRENGTH=%s ", symbol, timeframe, signal.buyStrength(), signal.sellStrength()));
                     }
                 }
         );

@@ -1,0 +1,81 @@
+package com.trading.signal.service;
+
+import com.trading.signal.entity.FourHour;
+import com.trading.signal.entity.OneDay;
+import com.trading.signal.entity.OneHour;
+import com.trading.signal.model.Signal;
+import com.trading.signal.repository.FourHourRepository;
+import com.trading.signal.repository.OneDayRepository;
+import com.trading.signal.repository.OneHourRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import static java.lang.Thread.sleep;
+
+@Service
+public class CommitSignalService {
+
+    private final Logger logger = LoggerFactory.getLogger(CommitSignalService.class);
+    private final FourHourRepository fourHourRepository;
+    private final OneHourRepository oneHourRepository;
+    private final OneDayRepository oneDayRepository;
+
+    public CommitSignalService(FourHourRepository fourHourRepository, OneHourRepository oneHourRepository, OneDayRepository oneDayRepository) {
+        this.fourHourRepository = fourHourRepository;
+        this.oneHourRepository = oneHourRepository;
+        this.oneDayRepository = oneDayRepository;
+    }
+
+    public void saveSignal(Signal signal) {
+        switch (signal.timeframe()) {
+            case H1 -> saveOneHour(signal);
+            case H4 -> saveFourHour(signal);
+            default -> saveOneDay(signal);
+        }
+    }
+
+    private void saveOneDay(Signal signal) {
+        Thread t = new Thread(() ->
+                oneDayRepository.findById(signal.symbol())
+                        .defaultIfEmpty(OneDay.fromSignal(signal, null))
+                        .flatMap(oneDay ->
+                                oneDayRepository.save(OneDay.fromSignal(signal, oneDay.version()))
+                        ).subscribe());
+        execute(t, signal);
+    }
+
+    private void saveOneHour(Signal signal) {
+        Thread t = new Thread(() ->
+                oneHourRepository.findById(signal.symbol())
+                        .defaultIfEmpty(OneHour.fromSignal(signal, null))
+                        .flatMap(oneDay ->
+                                oneHourRepository.save(OneHour.fromSignal(signal, oneDay.version()))
+                        ).subscribe());
+        execute(t, signal);
+    }
+
+    private void saveFourHour(Signal signal) {
+        Thread t = new Thread(() ->
+                fourHourRepository.findById(signal.symbol())
+                        .defaultIfEmpty(FourHour.fromSignal(signal, null
+                        ))
+                        .flatMap(oneDay ->
+                                fourHourRepository.save(FourHour.fromSignal(signal, oneDay.version()))
+                        ).subscribe());
+        execute(t, signal);
+    }
+
+    private void execute(Thread t, Signal signal) {
+        try {
+
+            t.start();
+            logger.info(String.format("Signal Saved for %s, Timeframe: %s", signal.symbol(), signal.timeframe()));
+            sleep(100);
+
+        } catch (Exception e) {
+            logger.error(String.format("Signal failed for %s, Timeframe: %s", signal.symbol(), signal.timeframe()));
+            logger.error(e.toString());
+        }
+    }
+}

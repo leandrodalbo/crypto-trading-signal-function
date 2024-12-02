@@ -21,7 +21,7 @@ import com.trading.signal.strategy.StochasticIndicatorStrategy;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SignalService {
+public class GenerateSignalService {
     private static final int TOTAL_STRATEGIES = 12;
     private static final double STRONG_STRENGTH = 0.5;
     private static final double MEDIUM_STRENGTH = 0.3;
@@ -41,7 +41,7 @@ public class SignalService {
     private final HammerAndShootingStarStrategy hammerAndShootingStarStrategy;
     private final TurtleStrategy turtleStrategy;
 
-    public SignalService(AdapterService adapterService, BollingBandsStrategy bollingBandsStrategy, EmaStrategy emaStrategy, EngulfingCandleStrategy engulfingCandleStrategy, MACDStrategy macdStrategy, LindaRashkeMACDStrategy lindaMacdStrategy, OnBalanceVolumeStrategy onBalanceVolumeStrategy, RSIDiveregenceStrategy rsiDiveregenceStrategy, RSIStrategy rsiStrategy, SmaStrategy smaStrategy, StochasticIndicatorStrategy stochasticIndicatorStrategy, HammerAndShootingStarStrategy hammerAndShootingStarStrategy, TurtleStrategy turtleStrategy) {
+    public GenerateSignalService(AdapterService adapterService, BollingBandsStrategy bollingBandsStrategy, EmaStrategy emaStrategy, EngulfingCandleStrategy engulfingCandleStrategy, MACDStrategy macdStrategy, LindaRashkeMACDStrategy lindaMacdStrategy, OnBalanceVolumeStrategy onBalanceVolumeStrategy, RSIDiveregenceStrategy rsiDiveregenceStrategy, RSIStrategy rsiStrategy, SmaStrategy smaStrategy, StochasticIndicatorStrategy stochasticIndicatorStrategy, HammerAndShootingStarStrategy hammerAndShootingStarStrategy, TurtleStrategy turtleStrategy) {
         this.adapterService = adapterService;
         this.bollingBandsStrategy = bollingBandsStrategy;
         this.emaStrategy = emaStrategy;

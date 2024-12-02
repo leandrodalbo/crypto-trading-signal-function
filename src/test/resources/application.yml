@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: crypto-trading-signal-function
+  r2dbc:
+    username: user
+    password: password
+    url: r2dbc:postgresql://localhost:5432/tradingsignal
+  sql:
+    init:
+      mode: always
+
+

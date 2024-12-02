@@ -64,7 +64,7 @@ public class SignalServiceTest {
     private HammerAndShootingStarStrategy hammerAndShootingStarStrategy;
 
     @InjectMocks
-    private SignalService service;
+    private GenerateSignalService service;
 
     @Test
     public void willGenerateASignal() {

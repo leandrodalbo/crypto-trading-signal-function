@@ -2,35 +2,77 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.4'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'maven-publish'
 	id("com.github.johnrengelman.shadow") version "8.1.1"
+	id 'org.springframework.boot.experimental.thin-launcher' version "1.0.31.RELEASE"
 }
-
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.*
 
-group = 'com.trading.signal'
+group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+	sourceCompatibility = '17'
 }
 
 repositories {
 	mavenCentral()
+	mavenLocal()
+	maven { url 'https://repo.spring.io/milestone' }
 }
 
 ext {
-	set('springCloudVersion', "2023.0.3")
+	set('springCloudVersion', "2023.0.0-M1")
+}
+
+assemble.dependsOn = [thinJar, shadowJar]
+
+publishing {
+	publications {
+		maven(MavenPublication) {
+			from components.java
+			versionMapping {
+				usage('java-api') {
+					fromResolutionOf('runtimeClasspath')
+				}
+				usage('java-runtime') {
+					fromResolutionResult()
+				}
+			}
+		}
+	}
+}
+
+shadowJar.mustRunAfter thinJar
+
+shadowJar {
+	archiveClassifier = 'aws'
+	manifest {
+		inheritFrom(project.tasks.thinJar.manifest)
+	}
+	// Required for Spring
+	mergeServiceFiles()
+	append 'META-INF/spring.handlers'
+	append 'META-INF/spring.schemas'
+	append 'META-INF/spring.tooling'
+	append 'META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports'
+	append 'META-INF/spring/org.springframework.boot.actuate.autoconfigure.web.ManagementContextConfiguration.imports'
+	transform(PropertiesFileTransformer) {
+		paths = ['META-INF/spring.factories']
+		mergeStrategy = "append"
+	}
 }
 
 dependencies {
-	implementation("org.springframework.cloud:spring-cloud-starter-function-webflux:4.1.1")
-	implementation("org.springframework.cloud:spring-cloud-function-adapter-aws:4.1.1")
+	implementation("org.springframework.cloud:spring-cloud-starter-function-webflux")
+	implementation("org.springframework.cloud:spring-cloud-starter-function-web")
+	implementation 'org.springframework.cloud:spring-cloud-function-adapter-aws'
+	implementation 'org.springframework.cloud:spring-cloud-function-context'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter'
-	implementation 'org.springframework.cloud:spring-cloud-function-context'
+
 	implementation 'com.tictactec:ta-lib:0.4.0'
 
 	runtimeOnly 'org.postgresql:postgresql'
@@ -53,27 +95,6 @@ dependencyManagement {
 	}
 }
 
-tasks.register('shadowTasks', ShadowJar) {
-    archiveClassifier = "aws"
-    dependencies {
-        exclude(
-                dependency("org.springframework.cloud:spring-cloud-function-web:4.1.1")
-        )
-    }
-    // Required for Spring
-    mergeServiceFiles()
-    append 'META-INF/spring.handlers'
-    append 'META-INF/spring.schemas'
-    append 'META-INF/spring.tooling'
-    transform( PropertiesFileTransformer) {
-        paths = ['META-INF/spring.factories']
-        mergeStrategy = "append"
-    }
-}
-
-tasks.named("assemble") {
-	dependsOn(shadowTasks)
-}
 tasks.named('test') {
 	useJUnitPlatform()
 }

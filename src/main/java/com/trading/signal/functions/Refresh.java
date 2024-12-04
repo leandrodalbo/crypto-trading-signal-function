@@ -1,11 +1,12 @@
 package com.trading.signal.functions;
 
-
 import com.trading.signal.service.RefreshService;
+import org.springframework.stereotype.Component;
+import java.util.function.Function;
 
-import java.util.function.Consumer;
+@Component
+public class    Refresh implements Function<Object, String> {
 
-public class Refresh implements Consumer<Object> {
     private final RefreshService refreshService;
 
     public Refresh(RefreshService refreshService) {
@@ -13,7 +14,8 @@ public class Refresh implements Consumer<Object> {
     }
 
     @Override
-    public void accept(Object o) {
+    public String apply(Object o) {
         refreshService.refresh();
+        return "Completed!!!";
     }
 }

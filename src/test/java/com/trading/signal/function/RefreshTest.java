@@ -23,7 +23,7 @@ public class RefreshTest {
     public void shouldCallRefreshService() {
         doNothing().when(service).refresh();
 
-        refreshFunction.accept(new Object());
+        refreshFunction.apply(new Object());
 
         verify(service, times(1)).refresh();
     }

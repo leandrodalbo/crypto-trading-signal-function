@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import static java.lang.Thread.sleep;
 
 @Service
@@ -36,33 +38,41 @@ public class CommitSignalService {
     }
 
     private void saveOneDay(Signal signal) {
-        Thread t = new Thread(() ->
-                oneDayRepository.findById(signal.symbol())
-                        .defaultIfEmpty(OneDay.fromSignal(signal, null))
-                        .flatMap(oneDay ->
-                                oneDayRepository.save(OneDay.fromSignal(signal, oneDay.version()))
-                        ).subscribe());
+        Thread t = new Thread(() -> {
+            Optional<OneDay> it = oneDayRepository.findById(signal.symbol());
+            if (it.isEmpty()) {
+                oneDayRepository.save(OneDay.fromSignal(signal, null));
+            } else {
+                oneDayRepository.save(OneDay.fromSignal(signal, it.get().version()));
+            }
+
+        });
         execute(t, signal);
     }
 
     private void saveOneHour(Signal signal) {
-        Thread t = new Thread(() ->
-                oneHourRepository.findById(signal.symbol())
-                        .defaultIfEmpty(OneHour.fromSignal(signal, null))
-                        .flatMap(oneDay ->
-                                oneHourRepository.save(OneHour.fromSignal(signal, oneDay.version()))
-                        ).subscribe());
+        Thread t = new Thread(() -> {
+            Optional<OneHour> it = oneHourRepository.findById(signal.symbol());
+            if (it.isEmpty()) {
+                oneHourRepository.save(OneHour.fromSignal(signal, null));
+            } else {
+                oneHourRepository.save(OneHour.fromSignal(signal, it.get().version()));
+            }
+        });
+
         execute(t, signal);
     }
 
     private void saveFourHour(Signal signal) {
-        Thread t = new Thread(() ->
-                fourHourRepository.findById(signal.symbol())
-                        .defaultIfEmpty(FourHour.fromSignal(signal, null
-                        ))
-                        .flatMap(oneDay ->
-                                fourHourRepository.save(FourHour.fromSignal(signal, oneDay.version()))
-                        ).subscribe());
+        Thread t = new Thread(() -> {
+            Optional<FourHour> it = fourHourRepository.findById(signal.symbol());
+            if (it.isEmpty()) {
+                fourHourRepository.save(FourHour.fromSignal(signal, null));
+            } else {
+                fourHourRepository.save(FourHour.fromSignal(signal, it.get().version()));
+            }
+        });
+
         execute(t, signal);
     }
 

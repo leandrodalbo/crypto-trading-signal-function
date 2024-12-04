@@ -7,52 +7,39 @@ import com.trading.signal.model.Timeframe;
 import com.trading.signal.model.TradingSignal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-import reactor.test.StepVerifier;
 
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@DataR2dbcTest
+@DataJdbcTest
 @Testcontainers
+@AutoConfigureTestDatabase(
+        replace = AutoConfigureTestDatabase.Replace.NONE
+)
 public class OneDayRepositoryTest {
 
     @Container
+    @ServiceConnection
     static PostgreSQLContainer<?> container =
-            new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
+            new PostgreSQLContainer<>(DockerImageName.parse("postgres:16.4"));
 
     @Autowired
     private OneDayRepository repository;
 
-    @DynamicPropertySource
-    static void postgresqlProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.r2dbc.url", OneDayRepositoryTest::postgresUrl);
-        registry.add("spring.r2dbc.username", container::getUsername);
-        registry.add("spring.r2dbc.password", container::getPassword);
-
-    }
-
-    private static String postgresUrl() {
-        return String.format("r2dbc:postgresql://%s:%s/%s",
-                container.getContainerIpAddress(),
-                container.getMappedPort(PostgreSQLContainer.POSTGRESQL_PORT),
-                container.getDatabaseName());
-    }
-
     @Test
     void willFindById() {
-        StepVerifier.create(repository.findById("BTCUSDT"))
-                .expectNextMatches(itr -> itr.symbol().equals("BTCUSDT"))
-                .verifyComplete();
+        var item = repository.findById("BTCUSDT");
+        assertThat("BTCUSDT").isEqualTo(item.get().symbol());
     }
 
     @Test
-    void shouldSaveManyRecords() {
+    void shouldSaveARecord() {
         OneDay oneDay = OneDay.fromSignal(Signal.of(
                 "RAYUSD",
                 Timeframe.H4,
@@ -71,8 +58,8 @@ public class OneDayRepositoryTest {
                 TradingSignal.SELL,
                 TradingSignal.SELL), null);
 
-        StepVerifier.create(repository.saveAll(List.of(oneDay)))
-                .thenConsumeWhile(it -> it.symbol().equals("RAYUSD"))
-                .verifyComplete();
+
+        var saved = repository.save(oneDay);
+        assertThat("RAYUSD").isEqualTo(saved.symbol());
     }
 }

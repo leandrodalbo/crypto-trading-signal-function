@@ -2,6 +2,7 @@ package com.trading.signal.entity;
 
 import com.trading.signal.model.Signal;
 import com.trading.signal.model.SignalStrength;
+import com.trading.signal.model.Timeframe;
 import com.trading.signal.model.TradingSignal;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
@@ -65,6 +66,7 @@ public record OneHour(
         @Version
         @Column("version")
         Integer version
+
 ) {
     public static OneHour fromSignal(Signal signal, Integer version) {
         return new OneHour(signal.symbol(),
@@ -85,4 +87,6 @@ public record OneHour(
                 signal.hammerAndShootingStars(),
                 version);
     }
+
+
 }

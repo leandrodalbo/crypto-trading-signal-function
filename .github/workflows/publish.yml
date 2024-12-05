@@ -35,15 +35,15 @@ jobs:
           cache: gradle
 
       - name: Set hash Variable
-        run: echo hash=${{ env.VERSION }} >> $GITHUB_ENV
+        run: echo TF_VAR_hash=${{ env.VERSION }} >> $GITHUB_ENV
 
       - name: Show hash Variable
-        run: echo $hash
+        run: echo $TF_VAR_hash
 
       - name: Build + UnitTests
         run: |
           chmod +x mvnw 
-          ./mvnw -Dhash=$hash clean install
+          ./mvnw -Dhash=$TF_VAR_hash clean install
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -75,6 +75,3 @@ jobs:
       - name: Recreate
         working-directory: terraform
         run: terraform apply -auto-approve -var-file=prod.tfvars > /dev/null
-
-
-

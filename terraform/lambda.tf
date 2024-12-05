@@ -1,8 +1,8 @@
 resource "aws_s3_object" "s3_lambda_object" {
   bucket = var.resources_bucket
-  key    = var.lambda_filename
-  source = var.file_location
-  etag   = filemd5(var.file_location)
+  key    = "lambda-function-${hash}-aws.jar"
+  source = "../target/lambda-function-${hash}-aws.jar"
+  etag   = filemd5("../target/lambda-function-${hash}-aws.jar")
 }
 
 resource "aws_lambda_function" "trading_signals_lambda" {
@@ -11,7 +11,7 @@ resource "aws_lambda_function" "trading_signals_lambda" {
   handler          = var.lambda_handler
   source_code_hash = aws_s3_object.s3_lambda_object.key
   s3_bucket        = var.resources_bucket
-  s3_key           = var.lambda_filename
+  s3_key           = "lambda-function-${hash}-aws.jar"
   runtime          = var.runtime
   timeout          = var.timeout
 

@@ -45,9 +45,6 @@ jobs:
           chmod +x mvnw 
           ./mvnw -Dhash=$TF_VAR_hash clean install
 
-      - name: Checkout
-        uses: actions/checkout@v2
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
@@ -64,7 +61,7 @@ jobs:
       - name: Recreate Plan
         id: plan
         working-directory: terraform
-        run: terraform plan -no-color -var-file=prod.tfvars 
+        run: terraform plan -no-color -var-file=prod.tfvars
         continue-on-error: true
 
       - name: Exit on Plan Failure

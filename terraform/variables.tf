@@ -26,11 +26,7 @@ variable "lambda_function" {
   type = string
 }
 
-variable "lambda_filename" {
-  type = string
-}
-
-variable "file_location" {
+variable "hash" {
   type = string
 }
 

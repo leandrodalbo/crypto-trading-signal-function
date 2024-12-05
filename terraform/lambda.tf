@@ -1,8 +1,8 @@
 resource "aws_s3_object" "s3_lambda_object" {
   bucket = var.resources_bucket
-  key    = "lambda-function-${hash}-aws.jar"
-  source = "../target/lambda-function-${hash}-aws.jar"
-  etag   = filemd5("../target/lambda-function-${hash}-aws.jar")
+  key    = "lambda-function-${var.hash}-aws.jar"
+  source = "../target/lambda-function-${var.hash}-aws.jar"
+  etag   = filemd5("../target/lambda-function-${var.hash}-aws.jar")
 }
 
 resource "aws_lambda_function" "trading_signals_lambda" {
@@ -11,18 +11,9 @@ resource "aws_lambda_function" "trading_signals_lambda" {
   handler          = var.lambda_handler
   source_code_hash = aws_s3_object.s3_lambda_object.key
   s3_bucket        = var.resources_bucket
-  s3_key           = "lambda-function-${hash}-aws.jar"
+  s3_key           = "lambda-function-${var.hash}-aws.jar"
   runtime          = var.runtime
   timeout          = var.timeout
-
-  vpc_config {
-    security_group_ids = [aws_security_group.lambda-sg.id]
-    subnet_ids = [
-      data.terraform_remote_state.resources.outputs.private_subnet_a_id,
-      data.terraform_remote_state.resources.outputs.private_subnet_b_id,
-      data.terraform_remote_state.resources.outputs.private_subnet_c_id
-    ]
-  }
 
   environment {
     variables = {

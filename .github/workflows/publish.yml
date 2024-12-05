@@ -64,7 +64,7 @@ jobs:
       - name: Recreate Plan
         id: plan
         working-directory: terraform
-        run: terraform plan -no-color -var-file=prod.tfvars > /dev/null
+        run: terraform plan -no-color -var-file=prod.tfvars 
         continue-on-error: true
 
       - name: Exit on Plan Failure
@@ -74,4 +74,4 @@ jobs:
 
       - name: Recreate
         working-directory: terraform
-        run: terraform apply -auto-approve -var-file=prod.tfvars > /dev/null
+        run: terraform apply -auto-approve -var-file=prod.tfvars

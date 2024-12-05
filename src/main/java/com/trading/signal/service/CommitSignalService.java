@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static java.lang.Thread.sleep;
 
 @Service
 public class CommitSignalService {
@@ -38,54 +37,30 @@ public class CommitSignalService {
     }
 
     private void saveOneDay(Signal signal) {
-        Thread t = new Thread(() -> {
-            Optional<OneDay> it = oneDayRepository.findById(signal.symbol());
-            if (it.isEmpty()) {
-                oneDayRepository.save(OneDay.fromSignal(signal, null));
-            } else {
-                oneDayRepository.save(OneDay.fromSignal(signal, it.get().version()));
-            }
 
-        });
-        execute(t, signal);
+        Optional<OneDay> it = oneDayRepository.findById(signal.symbol());
+        if (it.isEmpty()) {
+            oneDayRepository.save(OneDay.fromSignal(signal, null));
+        } else {
+            oneDayRepository.save(OneDay.fromSignal(signal, it.get().version()));
+        }
     }
 
     private void saveOneHour(Signal signal) {
-        Thread t = new Thread(() -> {
-            Optional<OneHour> it = oneHourRepository.findById(signal.symbol());
-            if (it.isEmpty()) {
-                oneHourRepository.save(OneHour.fromSignal(signal, null));
-            } else {
-                oneHourRepository.save(OneHour.fromSignal(signal, it.get().version()));
-            }
-        });
-
-        execute(t, signal);
+        Optional<OneHour> it = oneHourRepository.findById(signal.symbol());
+        if (it.isEmpty()) {
+            oneHourRepository.save(OneHour.fromSignal(signal, null));
+        } else {
+            oneHourRepository.save(OneHour.fromSignal(signal, it.get().version()));
+        }
     }
 
     private void saveFourHour(Signal signal) {
-        Thread t = new Thread(() -> {
-            Optional<FourHour> it = fourHourRepository.findById(signal.symbol());
-            if (it.isEmpty()) {
-                fourHourRepository.save(FourHour.fromSignal(signal, null));
-            } else {
-                fourHourRepository.save(FourHour.fromSignal(signal, it.get().version()));
-            }
-        });
-
-        execute(t, signal);
-    }
-
-    private void execute(Thread t, Signal signal) {
-        try {
-
-            t.start();
-            logger.info(String.format("Signal Saved for %s, Timeframe: %s", signal.symbol(), signal.timeframe()));
-            sleep(100);
-
-        } catch (Exception e) {
-            logger.error(String.format("Signal failed for %s, Timeframe: %s", signal.symbol(), signal.timeframe()));
-            logger.error(e.toString());
+        Optional<FourHour> it = fourHourRepository.findById(signal.symbol());
+        if (it.isEmpty()) {
+            fourHourRepository.save(FourHour.fromSignal(signal, null));
+        } else {
+            fourHourRepository.save(FourHour.fromSignal(signal, it.get().version()));
         }
     }
 }

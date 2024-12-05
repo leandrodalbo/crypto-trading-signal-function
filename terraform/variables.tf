@@ -26,10 +26,6 @@ variable "lambda_function" {
   type = string
 }
 
-variable "function_handler" {
-  type = string
-}
-
 variable "lambda_filename" {
   type = string
 }
@@ -39,10 +35,6 @@ variable "file_location" {
 }
 
 variable "lambda_handler" {
-  type = string
-}
-
-variable "main" {
   type = string
 }
 

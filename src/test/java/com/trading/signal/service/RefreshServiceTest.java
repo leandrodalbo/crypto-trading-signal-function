@@ -11,9 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -37,75 +34,66 @@ public class RefreshServiceTest {
     private RefreshService service;
 
     @Test
-    public void willPublishStrongBuy() {
+    public void willPublishStrongBuy() throws InterruptedException {
         Signal signal = Signal.of("BTCUSDT", Timeframe.D1, SignalStrength.STRONG, null, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
 
-        when(binanceData.fetchSymbols()).thenReturn(Mono.just(List.of("BTCUSDT")));
-        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(Mono.just(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)}));
+        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)});
         when(generateSignalService.generate(anyString(), any(), any())).thenReturn(signal);
-
         doNothing().when(commitSignalService).saveSignal(any(Signal.class));
 
-        service.refresh();
+        service.refresh("BTCUSDT", Timeframe.D1);
 
-        verify(binanceData, times(1)).fetchSymbols();
-        verify(binanceData, times(3)).fetchOHLC(anyString(), any());
-        verify(commitSignalService, times(3)).saveSignal(any(Signal.class));
-        verify(generateSignalService, times(3)).generate(anyString(), any(), any());
+        verify(binanceData, times(1)).fetchOHLC(anyString(), any());
+        verify(commitSignalService, times(1)).saveSignal(any(Signal.class));
+        verify(generateSignalService, times(1)).generate(anyString(), any(), any());
     }
 
     @Test
-    public void willPublishStrongSell() {
+    public void willPublishStrongSell() throws InterruptedException {
         Signal signal = Signal.of("BTCUSDT", Timeframe.D1, SignalStrength.LOW, SignalStrength.STRONG, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
 
-        when(binanceData.fetchSymbols()).thenReturn(Mono.just(List.of("BTCUSDT")));
-        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(Mono.just(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)}));
+        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)});
         when(generateSignalService.generate(anyString(), any(), any())).thenReturn(signal);
 
         doNothing().when(commitSignalService).saveSignal(any(Signal.class));
 
-        service.refresh();
+        service.refresh("BTCUSDT", Timeframe.D1);
 
-        verify(binanceData, times(1)).fetchSymbols();
-        verify(binanceData, times(3)).fetchOHLC(anyString(), any());
-        verify(commitSignalService, times(3)).saveSignal(any(Signal.class));
-        verify(generateSignalService, times(3)).generate(anyString(), any(), any());
+        verify(binanceData, times(1)).fetchOHLC(anyString(), any());
+        verify(commitSignalService, times(1)).saveSignal(any(Signal.class));
+        verify(generateSignalService, times(1)).generate(anyString(), any(), any());
     }
 
     @Test
-    public void willPublishMediumBuy() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, SignalStrength.MEDIUM, null, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
+    public void willPublishMediumBuy() throws InterruptedException {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.H1, SignalStrength.MEDIUM, null, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
 
-        when(binanceData.fetchSymbols()).thenReturn(Mono.just(List.of("BTCUSDT")));
-        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(Mono.just(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)}));
+        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)});
         when(generateSignalService.generate(anyString(), any(), any())).thenReturn(signal);
 
         doNothing().when(commitSignalService).saveSignal(any(Signal.class));
 
-        service.refresh();
+        service.refresh("BTCUSDT", Timeframe.H1);
 
-        verify(binanceData, times(1)).fetchSymbols();
-        verify(binanceData, times(3)).fetchOHLC(anyString(), any());
-        verify(commitSignalService, times(3)).saveSignal(any(Signal.class));
-        verify(generateSignalService, times(3)).generate(anyString(), any(), any());
+        verify(binanceData, times(1)).fetchOHLC(anyString(), any());
+        verify(commitSignalService, times(1)).saveSignal(any(Signal.class));
+        verify(generateSignalService, times(1)).generate(anyString(), any(), any());
     }
 
     @Test
-    public void willPublishMediumSell() {
-        Signal signal = Signal.of("BTCUSDT", Timeframe.D1, SignalStrength.LOW, SignalStrength.MEDIUM, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
+    public void willPublishMediumSell() throws InterruptedException {
+        Signal signal = Signal.of("BTCUSDT", Timeframe.H4, SignalStrength.LOW, SignalStrength.MEDIUM, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.BUY, TradingSignal.BUY, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.SELL, TradingSignal.NONE, TradingSignal.SELL, TradingSignal.NONE);
 
-        when(binanceData.fetchSymbols()).thenReturn(Mono.just(List.of("BTCUSDT")));
-        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(Mono.just(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)}));
+        when(binanceData.fetchOHLC(anyString(), any())).thenReturn(new Candle[]{Candle.of(55000.0f, 55130.0f, 49989.0f, 55100.1f, 2234.232f)});
         when(generateSignalService.generate(anyString(), any(), any())).thenReturn(signal);
 
         doNothing().when(commitSignalService).saveSignal(any(Signal.class));
 
-        service.refresh();
+        service.refresh("BTCUSDT", Timeframe.H4);
 
-        verify(binanceData, times(1)).fetchSymbols();
-        verify(binanceData, times(3)).fetchOHLC(anyString(), any());
-        verify(commitSignalService, times(3)).saveSignal(any(Signal.class));
-        verify(generateSignalService, times(3)).generate(anyString(), any(), any());
+        verify(binanceData, times(1)).fetchOHLC(anyString(), any());
+        verify(commitSignalService, times(1)).saveSignal(any(Signal.class));
+        verify(generateSignalService, times(1)).generate(anyString(), any(), any());
     }
 }
 

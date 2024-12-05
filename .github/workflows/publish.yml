@@ -32,7 +32,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-          cache: gradle
+          cache: maven
 
       - name: Set hash Variable
         run: echo TF_VAR_hash=${{ env.VERSION }} >> $GITHUB_ENV

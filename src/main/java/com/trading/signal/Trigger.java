@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Random;
 
 @Component
 public class Trigger {
     private final Logger logger = LoggerFactory.getLogger(Trigger.class);
 
-    private static final String SYMBOL_FILTER = "USD";
 
     private final RefreshService refreshService;
     private final BinanceData binanceData;
@@ -25,17 +25,20 @@ public class Trigger {
 
     public void scanSignals() {
         List<String> symbols = this.binanceData.fetchSymbols();
+        Random random = new Random(11);
 
-        for (String symbol : symbols) {
-            if (symbol.contains(SYMBOL_FILTER)) {
+        for (int i = 0; i < symbols.size(); i++) {
+            if(random.nextInt() % 2 == 0){
                 try {
-                    refreshService.refresh(symbol, Timeframe.H1);
-                    refreshService.refresh(symbol, Timeframe.H4);
-                    refreshService.refresh(symbol, Timeframe.D1);
+                    refreshService.refresh(symbols.get(i), Timeframe.H1);
+                    refreshService.refresh(symbols.get(i), Timeframe.H4);
+                    refreshService.refresh(symbols.get(i), Timeframe.D1);
                 } catch (Exception e) {
                     logger.error(e.toString());
                 }
             }
+
+
         }
     }
 }

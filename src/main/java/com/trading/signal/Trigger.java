@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static java.lang.Thread.sleep;
-
 @Component
 public class Trigger {
     private final Logger logger = LoggerFactory.getLogger(Trigger.class);
@@ -31,21 +29,9 @@ public class Trigger {
         for (String symbol : symbols) {
             if (symbol.contains(SYMBOL_FILTER)) {
                 try {
-                    Thread h1 = new Thread(() -> refreshService.refresh(symbol, Timeframe.H1));
-                    h1.join();
-                    h1.start();
-                    sleep(50);
-
-                    Thread h4 = new Thread(() -> refreshService.refresh(symbol, Timeframe.H4));
-                    h4.join();
-                    h4.start();
-                    sleep(50);
-
-                    Thread d1 = new Thread(() -> refreshService.refresh(symbol, Timeframe.D1));
-                    d1.join();
-                    d1.start();
-                    sleep(50);
-
+                    refreshService.refresh(symbol, Timeframe.H1);
+                    refreshService.refresh(symbol, Timeframe.H4);
+                    refreshService.refresh(symbol, Timeframe.D1);
                 } catch (Exception e) {
                     logger.error(e.toString());
                 }

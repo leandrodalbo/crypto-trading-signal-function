@@ -1,12 +1,15 @@
 package com.trading.signal.service;
 
 import com.trading.signal.exchange.BinanceData;
+import com.trading.signal.model.Candle;
+import com.trading.signal.model.Signal;
+import com.trading.signal.model.SignalStrength;
 import com.trading.signal.model.Timeframe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import static java.lang.Thread.sleep;
+import java.util.List;
 
 @Service
 public class RefreshService {
@@ -24,41 +27,21 @@ public class RefreshService {
         this.signalService = signalService;
     }
 
-
-    public void refresh() {
-        this.binanceData.fetchSymbols()
-                .subscribe(symbols -> symbols.forEach(
-                        symbol -> {
-                            Thread h1 = new Thread(() ->
-                                    publishSignal(symbol, Timeframe.H1));
-                            Thread h4 = new Thread(() ->
-                                    publishSignal(symbol, Timeframe.H4));
-                            Thread d1 = new Thread(() ->
-                                    publishSignal(symbol, Timeframe.D1));
-
-                            try {
-
-                                h1.start();
-                                sleep(100);
-                                h4.start();
-                                sleep(100);
-                                d1.start();
-                                sleep(100);
-
-                            } catch (Exception e) {
-                                logger.error(String.format("Signal Failed for %s ", symbol));
-                                logger.error(e.toString());
-                            }
-                        }
-                ));
+    public void refresh(String symbol, Timeframe timeframe) {
+        commit(signal(symbol, timeframe));
     }
 
-    private void publishSignal(String symbol, Timeframe timeframe) {
-        binanceData.fetchOHLC(symbol, timeframe).subscribe(
-                candles -> {
-                    logger.info(String.format("Analysing %s, Timeframe: %s ", symbol, timeframe));
-                    commitSignalService.saveSignal(signalService.generate(symbol, timeframe, candles));
-                }
-        );
+    private Signal signal(String symbol, Timeframe timeframe) {
+        logger.info(String.format("Processing %s, Timeframe: %s ", symbol, timeframe));
+        Candle[] candles = binanceData.fetchOHLC(symbol, timeframe);
+        return signalService.generate(symbol, timeframe, candles);
+    }
+
+    private void commit(Signal signal) {
+        if (SignalStrength.STRONG.equals(signal.buyStrength()) || SignalStrength.MEDIUM.equals(signal.buyStrength())
+                || SignalStrength.STRONG.equals(signal.sellStrength()) || SignalStrength.MEDIUM.equals(signal.sellStrength())) {
+            logger.info(String.format("Saving %s, Timeframe: %s ", signal.symbol(), signal.timeframe()));
+            commitSignalService.saveSignal(signal);
+        }
     }
 }

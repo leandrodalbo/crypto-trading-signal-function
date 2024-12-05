@@ -38,7 +38,6 @@ variable "lambda_handler" {
   type = string
 }
 
-
 variable "runtime" {
   type = string
 }

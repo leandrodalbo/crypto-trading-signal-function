@@ -33,7 +33,8 @@ resource "aws_iam_role_policy" "lambda_role_policy" {
           "sns:*",
           "ssm:*",
           "logs:*",
-          "s3:*"
+          "s3:*",
+          "ec2:*"
         ],
         "Resource":"*"
       }

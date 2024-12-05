@@ -7,17 +7,6 @@ Serverless Function
 - Use different trading indicators to find BUY/SELL signal
 - Every Signal is sent to rabbitmq to be processed
 
-# run unit tests
-
-```bash
-$./gradlew clean test
-```
-
-# start function locally
-
-```bash
-$./gradlew clean bootRun
-```
 
 # trigger function locally
 

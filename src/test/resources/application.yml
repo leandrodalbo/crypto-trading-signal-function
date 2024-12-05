@@ -8,5 +8,8 @@ spring:
   sql:
     init:
       mode: always
+testcontainers:
+  reuse:
+    enable: true
 
 

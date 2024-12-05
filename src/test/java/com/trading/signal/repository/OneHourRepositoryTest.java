@@ -27,7 +27,8 @@ public class OneHourRepositoryTest {
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> container =
-            new PostgreSQLContainer<>(DockerImageName.parse("postgres:16.4"));
+            new PostgreSQLContainer<>(DockerImageName.parse("postgres:16.4"))
+                    .withReuse(true);
 
     @Autowired
     private OneHourRepository repository;

@@ -33,7 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
-public class SignalServiceTest {
+public class GenerateSignalServiceTest {
 
     @Mock
     private AdapterService adapterService;
@@ -117,7 +117,6 @@ public class SignalServiceTest {
 
         assertThat(buyStrength).isEqualTo(SignalStrength.LOW);
         assertThat(sellStrength).isEqualTo(SignalStrength.LOW);
-
     }
 
     @Test

@@ -1,6 +1,5 @@
 package com.trading.signal.exchange;
 
-
 import com.trading.signal.model.Candle;
 import com.trading.signal.model.Timeframe;
 import org.slf4j.Logger;
@@ -8,8 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +23,11 @@ public class BinanceData {
     private static final String USDT = "USDT";
     private static final String BUSD = "BUSD";
 
-    protected final WebClient client;
+    protected final RestClient client;
 
     private final Logger logger = LoggerFactory.getLogger(BinanceData.class);
 
-    public BinanceData(WebClient webClient) {
+    public BinanceData(RestClient webClient) {
         this.client = webClient;
     }
 
@@ -52,7 +50,6 @@ public class BinanceData {
             );
 
         }
-
         return result;
     }
 
@@ -70,12 +67,11 @@ public class BinanceData {
                 symbols.add(symbol);
 
         }
-
         return symbols;
     }
 
-    public Mono<Candle[]> fetchOHLC(String symbol, Timeframe speed) {
-        return client.get()
+    public Candle[] fetchOHLC(String symbol, Timeframe speed) {
+        var result = client.get()
                 .uri(
                         builder -> builder.path(KLINES)
                                 .queryParam("symbol", symbol)
@@ -84,25 +80,23 @@ public class BinanceData {
                                 .build())
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
-                .bodyToMono(Object.class)
-                .map(it -> {
-                    if (it instanceof List<?>)
-                        return toCandlesArray((List) it);
-                    return new Candle[0];
-                })
-                .doOnError(e -> logger.error(e.getClass().getSimpleName()));
+                .body(Object.class);
+
+        if (result instanceof List<?>)
+            return toCandlesArray((List) result);
+        return new Candle[0];
     }
 
-    public Mono<List<String>> fetchSymbols() {
-        return client.get()
+    public List<String> fetchSymbols() {
+        var result = client.get()
                 .uri(
                         builder -> builder.path(EXCHANGE_INFO)
                                 .build())
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
-                .bodyToMono(List.class)
-                .map(BinanceData::toSymbolsList)
-                .doOnError(e -> logger.error(e.getClass().getSimpleName()));
+                .body(List.class);
+
+        return toSymbolsList(result);
     }
 
     private String interval(Timeframe speed) {
@@ -112,5 +106,4 @@ public class BinanceData {
             default -> "1d";
         };
     }
-
 }

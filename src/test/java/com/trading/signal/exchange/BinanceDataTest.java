@@ -12,9 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
+import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -36,13 +34,12 @@ public class BinanceDataTest {
         this.mockWebServer = new MockWebServer();
         this.mockWebServer.start();
 
-        var webClient = WebClient.builder()
+        var restClient = RestClient.builder()
                 .baseUrl(String.format("http://localhost:%s",
                         mockWebServer.getPort()))
                 .build();
 
-
-        this.binanceData = new BinanceData(webClient);
+        this.binanceData = new BinanceData(restClient);
     }
 
     @AfterEach
@@ -62,12 +59,7 @@ public class BinanceDataTest {
 
         mockWebServer.enqueue(mockResponse);
 
-        Mono symbols = binanceData.fetchSymbols();
-
-        StepVerifier.create(symbols)
-                .expectNextMatches(it -> it.equals(List.of("ZRXUSDT")))
-                .verifyComplete();
-
+        assertThat(List.of("ZRXUSDT")).isEqualTo(binanceData.fetchSymbols());
     }
 
     @Test
@@ -121,12 +113,7 @@ public class BinanceDataTest {
 
         mockWebServer.enqueue(mockResponse);
 
-        Mono candles = binanceData.fetchOHLC("BTCUSD", Timeframe.H1);
-
-        StepVerifier.create(candles)
-                .expectNextMatches(it -> ((Candle[]) it).length == 3)
-                .verifyComplete();
-
+        assertThat(binanceData.fetchOHLC("BTCUSD", Timeframe.H1).length).isEqualTo(3);
     }
 
     @Test
@@ -137,12 +124,7 @@ public class BinanceDataTest {
 
         mockWebServer.enqueue(mockResponse);
 
-        Mono candles = binanceData.fetchOHLC("BTCUSD", Timeframe.H1);
-
-        StepVerifier.create(candles)
-                .expectNextMatches(it -> ((Candle[]) it).length == 0)
-                .verifyComplete();
-
+        assertThat(binanceData.fetchOHLC("BTCUSD", Timeframe.H1).length).isEqualTo(0);
     }
 
     @Test
@@ -205,6 +187,4 @@ public class BinanceDataTest {
         assertThat(BinanceData.toSymbolsList(null)).isEqualTo(List.of());
         assertThat(BinanceData.toSymbolsList(List.of())).isEqualTo(List.of());
     }
-
-
 }

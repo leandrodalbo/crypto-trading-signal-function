@@ -1,8 +1,8 @@
 resource "aws_s3_object" "s3_lambda_object" {
   bucket = var.resources_bucket
-  key    = var.lambda_filename
-  source = var.file_location
-  etag   = filemd5(var.file_location)
+  key    = "lambda-function-${hash}-aws.jar"
+  source = "../target/lambda-function-${hash}-aws.jar"
+  etag   = filemd5("../target/lambda-function-${hash}-aws.jar")
 }
 
 resource "aws_lambda_function" "trading_signals_lambda" {
@@ -11,12 +11,22 @@ resource "aws_lambda_function" "trading_signals_lambda" {
   handler          = var.lambda_handler
   source_code_hash = aws_s3_object.s3_lambda_object.key
   s3_bucket        = var.resources_bucket
-  s3_key           = var.lambda_filename
+  s3_key           = "lambda-function-${hash}-aws.jar"
   runtime          = var.runtime
   timeout          = var.timeout
 
+  vpc_config {
+    security_group_ids = [aws_security_group.lambda-sg.id]
+    subnet_ids = [
+      data.terraform_remote_state.resources.outputs.private_subnet_a_id,
+      data.terraform_remote_state.resources.outputs.private_subnet_b_id,
+      data.terraform_remote_state.resources.outputs.private_subnet_c_id
+     ]
+  }
+
   environment {
     variables = {
+      SPRING_CLOUD_FUNCTION_DEFINITION = "refresh"
       SPRING_DATASOURCE_USERNAME = var.dbuser
       SPRING_DATASOURCE_PASSWORD = data.terraform_remote_state.resources.outputs.dbpswd
       SPRING_DATASOURCE_URL      = "jdbc:postgresql://${data.terraform_remote_state.resources.outputs.dbhost}:5432/${var.dbname}"

@@ -3,14 +3,14 @@ package com.trading.signal.conf;
 import com.tictactec.ta.lib.Core;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 
 @Configuration
 public class MainConf {
 
     @Bean
-    WebClient webClient(WebClient.Builder builder, CryptoDataConf dataConf) {
+    RestClient webClient(RestClient.Builder builder, CryptoDataConf dataConf) {
         return builder.baseUrl(dataConf.apiEndpoint()).build();
     }
 

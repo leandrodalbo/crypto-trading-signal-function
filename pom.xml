@@ -11,7 +11,7 @@
 
 	<groupId>com.trading.signal</groupId>
 	<artifactId>lambda-function</artifactId>
-	<version>1.0.0</version>
+	<version>${hash}</version>
 	<name>lambda-function</name>
 	<description>fetching-analyse-crypto-data</description>
 

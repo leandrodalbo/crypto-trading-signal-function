@@ -21,15 +21,15 @@ resource "aws_lambda_function" "trading_signals_lambda" {
       data.terraform_remote_state.resources.outputs.private_subnet_a_id,
       data.terraform_remote_state.resources.outputs.private_subnet_b_id,
       data.terraform_remote_state.resources.outputs.private_subnet_c_id
-     ]
+    ]
   }
 
   environment {
     variables = {
       SPRING_CLOUD_FUNCTION_DEFINITION = "refresh"
-      SPRING_DATASOURCE_USERNAME = var.dbuser
-      SPRING_DATASOURCE_PASSWORD = data.terraform_remote_state.resources.outputs.dbpswd
-      SPRING_DATASOURCE_URL      = "jdbc:postgresql://${data.terraform_remote_state.resources.outputs.dbhost}:5432/${var.dbname}"
+      SPRING_DATASOURCE_USERNAME       = var.dbuser
+      SPRING_DATASOURCE_PASSWORD       = data.terraform_remote_state.resources.outputs.dbpswd
+      SPRING_DATASOURCE_URL            = "jdbc:postgresql://${data.terraform_remote_state.resources.outputs.dbhost}:5432/${var.dbname}"
     }
   }
 }

@@ -64,7 +64,7 @@ public class BinanceData {
         for (int i = 0; i < values.size(); i++) {
             String symbol = ((Map<String, String>) values.get(i)).get("symbol");
 
-            if (symbol.endsWith(USDT) || symbol.endsWith(BUSD) || symbol.endsWith(USDC))
+            if (symbol.endsWith(USDT) || symbol.endsWith(USDC))
                 symbols.add(symbol);
 
         }

@@ -28,7 +28,7 @@ public class Trigger {
         Random random = new Random(11);
 
         for (int i = 0; i < symbols.size(); i++) {
-            if(random.nextInt() % 2 == 0){
+            if(random.nextInt() % 2 == 0 && random.nextInt() % 2 != 0){
                 try {
                     refreshService.refresh(symbols.get(i), Timeframe.H1);
                     refreshService.refresh(symbols.get(i), Timeframe.H4);

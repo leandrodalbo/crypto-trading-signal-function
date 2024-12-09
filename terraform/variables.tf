@@ -38,7 +38,15 @@ variable "runtime" {
   type = string
 }
 
-variable "cron" {
+variable "h1_cron" {
+  type = string
+}
+
+variable "h4_cron" {
+  type = string
+}
+
+variable "d1_cron" {
   type = string
 }
 

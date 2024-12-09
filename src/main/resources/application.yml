@@ -10,7 +10,6 @@ spring:
       scan:
         packages: com.trading.signal.functions
 
-
 sma:
   shortPeriod: 9
   longPeriod: 21
@@ -38,5 +37,7 @@ stoch:
   slowDPeriod: 3
 turtle:
   period: 20
-crypto-data:
-  apiEndpoint: https://api.binance.com
+
+conf:
+  api: https://api.binance.com
+  timeframe: D1

@@ -7,7 +7,7 @@ resource "aws_s3_object" "s3_lambda_object" {
 
 
 resource "aws_lambda_function" "h1_trading_signals_lambda" {
-  function_name    = var.lambda_function
+  function_name    = "${var.env}-h1-${var.lambda_function}"
   role             = data.terraform_remote_state.resources.outputs.lambda_role_arn
   handler          = var.lambda_handler
   source_code_hash = aws_s3_object.s3_lambda_object.key
@@ -29,7 +29,7 @@ resource "aws_lambda_function" "h1_trading_signals_lambda" {
 }
 
 resource "aws_lambda_function" "h4_trading_signals_lambda" {
-  function_name    = var.lambda_function
+  function_name    = "${var.env}-h4-${var.lambda_function}"
   role             = data.terraform_remote_state.resources.outputs.lambda_role_arn
   handler          = var.lambda_handler
   source_code_hash = aws_s3_object.s3_lambda_object.key
@@ -51,7 +51,7 @@ resource "aws_lambda_function" "h4_trading_signals_lambda" {
 }
 
 resource "aws_lambda_function" "d1_trading_signals_lambda" {
-  function_name    = var.lambda_function
+  function_name    = "${var.env}-d1-${var.lambda_function}"
   role             = data.terraform_remote_state.resources.outputs.lambda_role_arn
   handler          = var.lambda_handler
   source_code_hash = aws_s3_object.s3_lambda_object.key

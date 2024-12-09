@@ -11,7 +11,7 @@ public class MainConf {
 
     @Bean
     RestClient webClient(RestClient.Builder builder, CryptoDataConf dataConf) {
-        return builder.baseUrl(dataConf.apiEndpoint()).build();
+        return builder.baseUrl(dataConf.api()).build();
     }
 
     @Bean

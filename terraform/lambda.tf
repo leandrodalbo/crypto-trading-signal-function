@@ -78,12 +78,12 @@ resource "aws_cloudwatch_event_rule" "h1_trigger_rule" {
 }
 
 resource "aws_cloudwatch_event_rule" "h4_trigger_rule" {
-  name                 = "trigger_h4_lambda"
+  name                = "trigger_h4_lambda"
   schedule_expression = var.h4_cron
 }
 
 resource "aws_cloudwatch_event_rule" "d1_trigger_rule" {
-  name                  = "trigger_d1_lambda"
+  name                = "trigger_d1_lambda"
   schedule_expression = var.d1_cron
 }
 

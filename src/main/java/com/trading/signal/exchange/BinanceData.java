@@ -21,8 +21,6 @@ public class BinanceData {
     private static final int TOTAL_CANDLES = 150;
 
     private static final String USDT = "USDT";
-    private static final String BUSD = "BUSD";
-    private static final String USDC = "USDC";
 
     protected final RestClient client;
 
@@ -64,7 +62,7 @@ public class BinanceData {
         for (int i = 0; i < values.size(); i++) {
             String symbol = ((Map<String, String>) values.get(i)).get("symbol");
 
-            if (symbol.endsWith(USDT) || symbol.endsWith(USDC))
+            if (symbol.endsWith(USDT))
                 symbols.add(symbol);
 
         }

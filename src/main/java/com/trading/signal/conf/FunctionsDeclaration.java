@@ -1,7 +1,6 @@
 package com.trading.signal.conf;
 
 import com.trading.signal.Trigger;
-import com.trading.signal.service.RefreshService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.TemporalField;
 import java.util.function.Function;
 
 @Configuration
@@ -22,7 +18,7 @@ public class FunctionsDeclaration {
     private Trigger trigger;
 
     @Bean
-    public Function<Object, String> reverseString() {
+    public Function<Object, String> triggerScan() {
         return (o) -> {
             var started = Instant.now();
             trigger.scanSignals();
